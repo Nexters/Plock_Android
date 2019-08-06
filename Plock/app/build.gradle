@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.1"
@@ -21,15 +23,43 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // google library
+    implementation "com.google.android.gms:play-services-maps:$rootProject.google_maps_version"
+    implementation "com.google.android.gms:play-services-location:$rootProject.google_location_version"
+    implementation "com.google.android.libraries.places:places:$rootProject.google_places_version"
+
+    //lifecycle
+    kapt "androidx.lifecycle:lifecycle-compiler:$rootProject.lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycle_version"
+
+    // room
+    implementation "androidx.room:room-runtime:$rootProject.room_version"
+    kapt "androidx.room:room-compiler:$rootProject.room_version"
+
+    // data binding
+    kapt "com.android.databinding:compiler:$rootProject.databinding_version"
+
+    // dexter
+    implementation "com.karumi:dexter:$rootProject.dexter_version"
+
+    // junit
+    testImplementation "junit:junit:$rootProject.junit_version"
+
+    // androidx
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompat_version"
+    implementation "androidx.core:core-ktx:$rootProject.core_ktx_version"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintlayout_version"
+    androidTestImplementation "androidx.test:runner:$rootProject.test_runner_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.core_version"
+    implementation "androidx.cardview:cardview:$rootProject.cardView_version"
 }
