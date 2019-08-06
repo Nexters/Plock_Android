@@ -52,6 +52,9 @@ dependencies {
     // dexter
     implementation "com.karumi:dexter:$rootProject.dexter_version"
 
+    // anko
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+
     // junit
     testImplementation "junit:junit:$rootProject.junit_version"
 
