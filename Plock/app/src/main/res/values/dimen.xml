@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_sheet_corner_radius">32dp</dimen>
+    <dimen name="bottom_sheet_top_padding">8dp</dimen>
+
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- toolbar dimen -->
+    <dimen name="toolbar_height">48dp</dimen>
+    <dimen name="toolbar_left_margin">18dp</dimen>
+    <dimen name="toolbar_right_margin">18dp</dimen>
+    <dimen name="toolbar_top_margin">12dp</dimen>
+    <dimen name="toolbar_bottom_margin">12dp</dimen>
+    <dimen name="toolbar_image_size">24dp</dimen>
+    <dimen name="toolbar_txv_size">27dp</dimen>
+</resources>
