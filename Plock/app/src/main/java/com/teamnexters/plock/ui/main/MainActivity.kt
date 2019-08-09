@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.teamnexters.plock.R
 import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.ui.show.ShowActivity
-import com.teamnexters.plock.ui.writeCard.WriteCardActivity
+import com.teamnexters.plock.ui.writecard.WriteCardActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {

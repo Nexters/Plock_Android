@@ -1,4 +1,4 @@
-package com.teamnexters.plock.ui.writeCard
+package com.teamnexters.plock.ui.writecard
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

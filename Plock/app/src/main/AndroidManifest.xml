@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.show.ShowActivity"/>
-        <activity android:name=".ui.writeCard.WriteCardActivity"/>
+        <activity android:name=".ui.writecard.WriteCardActivity"/>
     </application>
 
 </manifest>
