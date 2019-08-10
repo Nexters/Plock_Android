@@ -14,5 +14,5 @@ data class TimeCapsule(
     val latitude: Double,
     val longitude: Double,
     val photo: String,
-    val contents: String
+    val message: String
 )

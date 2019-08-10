@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/img_card_background"
+            app:layout_constraintDimensionRatio="H,3:5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginLeft="@dimen/card_margin_side"
+            android:layout_marginRight="@dimen/card_margin_side"
+            android:layout_marginBottom="@dimen/card_margin_bottom">
+
+        <ImageView
+                android:id="@+id/cardPhotoIv"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:srcCompat="@drawable/img_main_character"
+                android:background="@color/white"
+                app:layout_constraintDimensionRatio="H,1:1.25"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginRight="18dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="40dp"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/cardPhotoIv"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="8dp"
+                android:orientation="vertical"
+                android:layout_marginLeft="@dimen/card_content_margin_left"
+                android:layout_marginRight="@dimen/card_content_margin_right">
+
+            <LinearLayout
+                    android:id="@+id/cardDateLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:id="@+id/cardDateTv"
+                        style="@style/GyeonggiBatangTv"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:textColor="@color/gray2"
+                        android:text="2019.07.26"/>
+
+                <ImageView
+                        android:id="@+id/changeDateIv"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:padding="3dp"
+                        app:srcCompat="@drawable/ic_arrow_right"
+                        android:tint="@color/gray4"/>
+            </LinearLayout>
+
+            <EditText
+                    android:id="@+id/cardTitleEditTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gyeonggi_batang_bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/gray1"
+                    android:textColorHint="@color/gray4"
+                    android:hint="@string/hint_card_name"
+                    android:background="@null"
+                    android:layout_marginTop="16dp"
+                    android:inputType="text"
+                    android:importantForAutofill="no"
+                    tools:targetApi="o"/>
+
+            <TextView
+                    android:id="@+id/cardTitleTv"
+                    style="@style/GyeonggiBatangBoldTv"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp"/>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        app:srcCompat="@drawable/ic_location_pin"
+                        android:tint="@color/gray4"
+                        android:layout_marginTop="1dp"/>
+
+                <TextView
+                        style="@style/GyeonggiBatangTv"
+                        android:layout_weight="1"
+                        android:textColor="@color/gray2"
+                        android:textSize="12sp"
+                        android:text="롯데월드 에버랜드 가고싶다"/>
+
+                <ImageView
+                        android:id="@+id/changePlaceIv"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:padding="3dp"
+                        app:srcCompat="@drawable/ic_arrow_right"
+                        android:tint="@color/gray4"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

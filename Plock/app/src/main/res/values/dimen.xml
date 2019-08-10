@@ -13,4 +13,9 @@
     <dimen name="toolbar_bottom_margin">12dp</dimen>
     <dimen name="toolbar_image_size">24dp</dimen>
     <dimen name="toolbar_txv_size">27dp</dimen>
+
+    <dimen name="card_margin_side">34dp</dimen>
+    <dimen name="card_margin_bottom">16dp</dimen>
+    <dimen name="card_content_margin_left">26dp</dimen>
+    <dimen name="card_content_margin_right">20dp</dimen>
 </resources>

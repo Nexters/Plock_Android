@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Plock</string>
+
+    <string name="hint_card_name">장소 이름을 지어주세요.</string>
+    <string name="hint_card_message">다양한 이야기를 담아주세요.</string>
 </resources>
