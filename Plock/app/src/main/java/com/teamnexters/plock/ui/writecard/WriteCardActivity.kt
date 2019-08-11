@@ -20,6 +20,8 @@ class WriteCardActivity : AppCompatActivity() {
 
     private lateinit var rightOutAnim: AnimatorSet
     private lateinit var leftInAnim: AnimatorSet
+    private lateinit var rightInAnim: AnimatorSet
+    private lateinit var leftOutAnim: AnimatorSet
     private var isBackVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,35 +55,34 @@ class WriteCardActivity : AppCompatActivity() {
     }
 
     private fun flipToBack(){
-        rightOutAnim.setTarget(cardFront)
+        leftOutAnim.setTarget(cardFront)
         leftInAnim.setTarget(cardBack)
+        leftOutAnim.start()
+        leftInAnim.start()
         isBackVisible = true
-        startAnim()
     }
 
     private fun flipToFront(){
         rightOutAnim.setTarget(cardBack)
-        leftInAnim.setTarget(cardFront)
+        rightInAnim.setTarget(cardFront)
+        rightOutAnim.start()
+        rightInAnim.start()
         isBackVisible = false
-        startAnim()
     }
 
     private fun loadFlipAnimations() {
         rightOutAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_right_out) as AnimatorSet
         leftInAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_left_in) as AnimatorSet
+        leftOutAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_left_out) as AnimatorSet
+        rightInAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_right_in) as AnimatorSet
         changeCameraDistance()
     }
 
     private fun changeCameraDistance() {
-        val distance = 8000
+        val distance = 3000
         val scale = resources.displayMetrics.density * distance
         cardFront.cameraDistance = scale
         cardBack.cameraDistance = scale
-    }
-
-    private fun startAnim(){
-        rightOutAnim.start()
-        leftInAnim.start()
     }
 
     private fun setToolbarRightBtnNext() =
