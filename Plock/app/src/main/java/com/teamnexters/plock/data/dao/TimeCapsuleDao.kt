@@ -6,7 +6,7 @@ import com.teamnexters.plock.data.entity.TimeCapsule
 @Dao
 interface TimeCapsuleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTimeCapsule(timeCapsule: TimeCapsule)
+    fun saveTimeCapsule(timeCapsule: TimeCapsule)
 
     @Delete
     fun deleteTimeCapsule(timeCapsule: TimeCapsule)

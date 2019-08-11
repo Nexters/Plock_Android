@@ -9,9 +9,20 @@ import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import com.teamnexters.plock.data.entity.TimeCapsule
+import com.teamnexters.plock.extensions.plusAssign
+import com.teamnexters.plock.extensions.start
+import com.teamnexters.plock.rx.AutoClearedDisposable
+import com.teamnexters.plock.ui.main.MainActivity
+import java.util.*
 
 
 class WriteCardActivity : AppCompatActivity() {
+    internal val disposables = AutoClearedDisposable(this)
+
+    internal val viewDisposables
+            = AutoClearedDisposable(lifecycleOwner = this, alwaysClearOnStop = false)
+
     internal val viewModelFactory by lazy {
         WriteCardViewModelFactory(provideTimeCapsuleDao(this))
     }
@@ -29,8 +40,10 @@ class WriteCardActivity : AppCompatActivity() {
         setContentView(R.layout.activity_write_card)
 
         viewModel = ViewModelProviders.of(
-            this, viewModelFactory
-        )[WriteCardViewModel::class.java]
+            this, viewModelFactory)[WriteCardViewModel::class.java]
+
+        lifecycle += disposables
+        lifecycle += viewDisposables
 
         initToolbar()
         loadFlipAnimations()
@@ -45,16 +58,23 @@ class WriteCardActivity : AppCompatActivity() {
                 flipToBack()
                 setToolbarRightBtnFinish()
             } else {
-                showFinalCheckDialog()
+//                showFinalCheckDialog()
+                saveCard()
             }
         }
+    }
+
+    private fun saveCard() {
+        val timeCapsule = TimeCapsule("제목", Date(),"장소",37.541,126.986,"사진","룰루랄라")
+        disposables += viewModel.saveTimeCapsule(timeCapsule)
+        start(MainActivity::class)
     }
 
     private fun showFinalCheckDialog() {
 
     }
 
-    private fun flipToBack(){
+    private fun flipToBack() {
         leftOutAnim.setTarget(cardFront)
         leftInAnim.setTarget(cardBack)
         leftOutAnim.start()
@@ -62,7 +82,7 @@ class WriteCardActivity : AppCompatActivity() {
         isBackVisible = true
     }
 
-    private fun flipToFront(){
+    private fun flipToFront() {
         rightOutAnim.setTarget(cardBack)
         rightInAnim.setTarget(cardFront)
         rightOutAnim.start()
