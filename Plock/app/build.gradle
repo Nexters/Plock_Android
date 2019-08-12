@@ -44,6 +44,10 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-compiler:$rootProject.lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycle_version"
 
+    // rx
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+
     // room
     implementation "androidx.room:room-runtime:$rootProject.room_version"
     kapt "androidx.room:room-compiler:$rootProject.room_version"
@@ -53,9 +57,6 @@ dependencies {
 
     // dexter
     implementation "com.karumi:dexter:$rootProject.dexter_version"
-
-    // anko
-    implementation "org.jetbrains.anko:anko-commons:$anko_version"
 
     // junit
     testImplementation "junit:junit:$rootProject.junit_version"

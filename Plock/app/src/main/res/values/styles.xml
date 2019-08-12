@@ -8,4 +8,16 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="GyeonggiBatangTv"  parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/gyeonggi_batang</item>
+        <item name="android:textColor">@color/gray1</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="GyeonggiBatangBoldTv"  parent="@style/GyeonggiBatangTv">
+        <item name="android:fontFamily">@font/gyeonggi_batang_bold</item>
+    </style>
+
 </resources>

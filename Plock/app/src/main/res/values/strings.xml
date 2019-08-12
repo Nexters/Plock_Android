@@ -4,4 +4,7 @@
     <!-- bottom sheet -->
     <string name="sheet_set_button">설정하기</string>
     <string name="sheet_txv">핀을 움직여 카드의 위치를 설정하세요.</string>
+
+    <string name="hint_card_name">장소 이름을 지어주세요.</string>
+    <string name="hint_card_message">다양한 이야기를 담아주세요.</string>
 </resources>

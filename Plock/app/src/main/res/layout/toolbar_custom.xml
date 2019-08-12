@@ -28,11 +28,11 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:layout_marginStart="@dimen/toolbar_left_margin"
-                    app:srcCompat="@drawable/toolbar_back"
+                    app:srcCompat="@drawable/ic_arrow_left"
             />
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/txv_toolbar_center"
+                    android:id="@+id/tv_toolbar_center"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/toolbar_txv_size"
                     app:layout_constraintTop_toTopOf="parent"
