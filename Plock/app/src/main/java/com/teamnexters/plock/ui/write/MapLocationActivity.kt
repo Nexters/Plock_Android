@@ -210,7 +210,7 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun initToolbar() {
-        val textView = findViewById<TextView>(R.id.txv_toolbar_center)
+        val textView = findViewById<TextView>(R.id.tv_toolbar_center)
         textView.text = "위치 설정"
     }
 

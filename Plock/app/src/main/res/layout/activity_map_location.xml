@@ -23,7 +23,7 @@
                 android:layout_height="@dimen/imv_alram_height"
                 android:layout_centerInParent="true"
                 android:translationY="-50dp"
-                android:background="@drawable/alram"
+                android:background="@drawable/alarm"
         >
 
         </androidx.constraintlayout.widget.ConstraintLayout>
