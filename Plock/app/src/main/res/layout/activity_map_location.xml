@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.write.MapLocationActivity">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <fragment
+                android:id="@+id/mapLocationFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+        />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="@dimen/imv_alram_width"
+                android:layout_height="@dimen/imv_alram_height"
+                android:layout_centerInParent="true"
+                android:translationY="-50dp"
+                android:background="@drawable/alram"
+        >
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <include
+                android:id="@+id/toolbar_map_location"
+                layout="@layout/toolbar_custom"
+        />
+
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchor="@id/bottom_sheet"
+            app:layout_anchorGravity="end"
+            android:layout_gravity="top">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_map_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:src="@drawable/fab_map_location"
+                app:backgroundTint="@color/white"
+                app:fabSize="normal"
+                android:scaleType="center"
+        />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <include
+            layout="@layout/bottom_sheet_map"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
