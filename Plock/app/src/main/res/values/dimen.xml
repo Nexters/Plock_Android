@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="bottom_sheet_corner_radius">32dp</dimen>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="bottom_sheet_corner_radius">25dp</dimen>
     <dimen name="bottom_sheet_top_padding">8dp</dimen>
 
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -13,4 +13,19 @@
     <dimen name="toolbar_bottom_margin">12dp</dimen>
     <dimen name="toolbar_image_size">24dp</dimen>
     <dimen name="toolbar_txv_size">27dp</dimen>
+
+    <!-- bottom sheet -->
+    <dimen name="bottom_sheet_height">188dp</dimen>
+    <dimen name="bottom_sheet_btn_width">315dp</dimen>
+    <dimen name="bottom_sheet_btn_height">42dp</dimen>
+    <dimen name="bottom_sheet_txv_width">327dp</dimen>
+    <dimen name="bottom_sheet_txv_height">43dp</dimen>
+    <dimen name="bottom_sheet_txv_left_margin">12dp</dimen>
+
+    <!--Floating action button-->
+    <dimen name="design_fab_image_size" tools:override="true">30dp</dimen>
+
+    <!-- marker -->
+    <dimen name="imv_alram_height">74dp</dimen>
+    <dimen name="imv_alram_width">64dp</dimen>
 </resources>

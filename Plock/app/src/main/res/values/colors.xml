@@ -10,4 +10,5 @@
 
     <!-- toolbar -->
     <color name="white_80">#cdffffff</color>
+    <color name="charcoal_grey">#343a40</color>
 </resources>

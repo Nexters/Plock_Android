@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Plock</string>
+
+    <!-- bottom sheet -->
+    <string name="sheet_set_button">설정하기</string>
+    <string name="sheet_txv">핀을 움직여 카드의 위치를 설정하세요.</string>
 </resources>
