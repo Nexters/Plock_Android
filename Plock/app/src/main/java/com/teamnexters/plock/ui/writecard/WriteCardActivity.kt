@@ -11,6 +11,7 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.extensions.plusAssign
+import com.teamnexters.plock.extensions.px
 import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import com.teamnexters.plock.ui.main.MainActivity
@@ -20,8 +21,7 @@ import java.util.*
 class WriteCardActivity : AppCompatActivity() {
     internal val disposables = AutoClearedDisposable(this)
 
-    internal val viewDisposables
-            = AutoClearedDisposable(lifecycleOwner = this, alwaysClearOnStop = false)
+    internal val viewDisposables = AutoClearedDisposable(lifecycleOwner = this, alwaysClearOnStop = false)
 
     internal val viewModelFactory by lazy {
         WriteCardViewModelFactory(provideTimeCapsuleDao(this))
@@ -40,12 +40,14 @@ class WriteCardActivity : AppCompatActivity() {
         setContentView(R.layout.activity_write_card)
 
         viewModel = ViewModelProviders.of(
-            this, viewModelFactory)[WriteCardViewModel::class.java]
+            this, viewModelFactory
+        )[WriteCardViewModel::class.java]
 
         lifecycle += disposables
         lifecycle += viewDisposables
 
         initToolbar()
+        initCardSize()
         loadFlipAnimations()
 
         imv_toolbar_left.setOnClickListener {
@@ -65,7 +67,7 @@ class WriteCardActivity : AppCompatActivity() {
     }
 
     private fun saveCard() {
-        val timeCapsule = TimeCapsule("제목", Date(),"장소",37.541,126.986,"사진","룰루랄라")
+        val timeCapsule = TimeCapsule("제목", Date(), "장소", 37.541, 126.986, "사진", "룰루랄라")
         disposables += viewModel.saveTimeCapsule(timeCapsule)
         start(MainActivity::class)
     }
@@ -99,7 +101,7 @@ class WriteCardActivity : AppCompatActivity() {
     }
 
     private fun changeCameraDistance() {
-        val distance = 3000
+        val distance = 6000
         val scale = resources.displayMetrics.density * distance
         cardFront.cameraDistance = scale
         cardBack.cameraDistance = scale
@@ -110,6 +112,11 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun setToolbarRightBtnFinish() =
         imv_toolbar_right.setImageResource(R.drawable.toolbar_active)
+
+    private fun initCardSize(){
+        val margin = 35.px
+        cardLayout.setPadding(margin, 0, margin, 8)
+    }
 
     private fun initToolbar() {
         tv_toolbar_center.text = "작성"

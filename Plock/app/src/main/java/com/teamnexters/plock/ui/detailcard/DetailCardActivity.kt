@@ -7,6 +7,7 @@ import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.plusAssign
+import com.teamnexters.plock.extensions.px
 import com.teamnexters.plock.extensions.runOnIoScheduler
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import com.teamnexters.plock.ui.writecard.WriteCardViewModel
@@ -30,6 +31,7 @@ class DetailCardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_card)
         initToolbar()
+        initCardSize()
 
         viewModel = ViewModelProviders.of(
             this, viewModelFactory
@@ -38,16 +40,6 @@ class DetailCardActivity : AppCompatActivity() {
         lifecycle += disposables
         lifecycle += viewDisposables
 
-        cardViewPager.run {
-            val dpValue = 40
-            val d = resources.displayMetrics.density
-            val margin = (dpValue * d).toInt()
-
-            clipToPadding = false
-            setPadding(margin, 0, margin, 0)
-            pageMargin = margin / 2
-
-        }
 
         // 임시 : 열람하기-리스트 구현 완료되면 intent로 데이터 받아오기
         runOnIoScheduler {
@@ -72,10 +64,18 @@ class DetailCardActivity : AppCompatActivity() {
         if (list.size == 0) finish()
     }
 
-    private fun initToolbar() {
-        tv_toolbar_center.text = "작성"
-        imv_toolbar_right.setImageResource(R.drawable.ic_delete)
+    private fun initCardSize(){
+        val margin = 35.px
 
+        cardViewPager.run {
+            clipToPadding = false
+            setPadding(margin, 0, margin, 16)
+            pageMargin = margin / 4
+        }
+    }
+
+    private fun initToolbar() {
+        imv_toolbar_right.setImageResource(R.drawable.ic_delete)
         imv_toolbar_left.setOnClickListener { finish() }
     }
 }
