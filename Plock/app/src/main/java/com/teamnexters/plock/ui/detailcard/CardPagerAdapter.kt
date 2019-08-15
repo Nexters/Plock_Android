@@ -42,4 +42,8 @@ class CardPagerAdapter(private val showTimeCapsuleList: List<TimeCapsule>) : Pag
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as View)
     }
+
+    override fun getItemPosition(`object`: Any): Int {
+        return POSITION_NONE
+    }
 }

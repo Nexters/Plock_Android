@@ -23,7 +23,7 @@ class DetailCardActivity : AppCompatActivity() {
         DetailCardViewModelFactory(provideTimeCapsuleDao(this))
     }
     lateinit var viewModel: DetailCardViewModel
-    lateinit var list: List<TimeCapsule>
+    lateinit var list: ArrayList<TimeCapsule>
     lateinit var adapter: CardPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,25 +48,34 @@ class DetailCardActivity : AppCompatActivity() {
             pageMargin = margin / 2
 
         }
+
+        // 임시 : 열람하기-리스트 구현 완료되면 intent로 데이터 받아오기
         runOnIoScheduler {
-            list = provideTimeCapsuleDao(this).loadAllTimeCapsule()
+            list = ArrayList(provideTimeCapsuleDao(this).loadAllTimeCapsule())
             runOnUiThread {
                 adapter = CardPagerAdapter(list)
                 cardViewPager.adapter = adapter
             }
+        }
 
-            imv_toolbar_right.setOnClickListener {
-                deleteCard()
-            }
+        imv_toolbar_right.setOnClickListener {
+            deleteCard()
+            adapter.notifyDataSetChanged()
         }
     }
 
     private fun deleteCard() {
-        viewModel.deleteCard(list.get(cardViewPager.currentItem))
+        val deleteItem = list.get(cardViewPager.currentItem)
+        viewModel.deleteCard(deleteItem)
+        list.remove(deleteItem)
+
+        if (list.size == 0) finish()
     }
 
     private fun initToolbar() {
         tv_toolbar_center.text = "작성"
         imv_toolbar_right.setImageResource(R.drawable.ic_delete)
+
+        imv_toolbar_left.setOnClickListener { finish() }
     }
 }
