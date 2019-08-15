@@ -28,10 +28,10 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.teamnexters.plock.R
+import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.util.MapTools
 import kotlinx.android.synthetic.main.activity_map_location.*
 import kotlinx.android.synthetic.main.bottom_sheet_map.*
-import org.jetbrains.anko.startActivity
 
 class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -52,7 +52,7 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         initMapFragment()
         initBottomSheet()
 
-        sheet_custom_layout.setOnClickListener { startActivity<FindLocationActivity>() }
+        sheet_custom_layout.setOnClickListener { start(FindLocationActivity::class) }
         fab_map_location.setOnClickListener { checkGPS() }
     }
 
