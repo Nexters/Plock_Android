@@ -3,6 +3,7 @@ package com.teamnexters.plock.ui.detailcard
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.viewpager.widget.PagerAdapter
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
@@ -24,6 +25,7 @@ class CardPagerAdapter(private val showTimeCapsuleList: List<TimeCapsule>) : Pag
             with(item){
                 cardTitleTv.text = title
                 cardMessageTv.text = message
+                cardPhotoIv.setImageURI(photo.toUri())
             }
         }
 

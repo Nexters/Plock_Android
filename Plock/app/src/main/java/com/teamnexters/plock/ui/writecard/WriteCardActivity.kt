@@ -15,8 +15,14 @@ import com.teamnexters.plock.extensions.px
 import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import com.teamnexters.plock.ui.main.MainActivity
+import kotlinx.android.synthetic.main.card_front.*
 import java.util.*
+import android.provider.MediaStore
+import android.content.Intent
+import android.net.Uri
 
+
+private const val PICK_FROM_ALBUM = 1
 
 class WriteCardActivity : AppCompatActivity() {
     internal val disposables = AutoClearedDisposable(this)
@@ -28,6 +34,8 @@ class WriteCardActivity : AppCompatActivity() {
     }
 
     lateinit var viewModel: WriteCardViewModel
+
+    private lateinit var selectedImage: Uri
 
     private lateinit var rightOutAnim: AnimatorSet
     private lateinit var leftInAnim: AnimatorSet
@@ -50,9 +58,19 @@ class WriteCardActivity : AppCompatActivity() {
         initCardSize()
         loadFlipAnimations()
 
+        cardPhotoIv.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = MediaStore.Images.Media.CONTENT_TYPE
+            startActivityForResult(intent, PICK_FROM_ALBUM)
+        }
+
         imv_toolbar_left.setOnClickListener {
-            flipToFront()
-            setToolbarRightBtnNext()
+            if (isBackVisible) {
+                flipToFront()
+                setToolbarRightBtnNext()
+            } else {
+                finish()
+            }
         }
 
         imv_toolbar_right.setOnClickListener {
@@ -66,8 +84,17 @@ class WriteCardActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            PICK_FROM_ALBUM -> {
+                selectedImage = data?.data ?: return
+                cardPhotoIv.setImageURI(selectedImage)
+            }
+        }
+    }
+
     private fun saveCard() {
-        val timeCapsule = TimeCapsule("제목", Date(), "장소", 37.541, 126.986, "사진", "룰루랄라")
+        val timeCapsule = TimeCapsule("제목", Date(), "장소", 37.541, 126.986, selectedImage.toString(), "룰루랄라")
         disposables += viewModel.saveTimeCapsule(timeCapsule)
         start(MainActivity::class)
     }
@@ -113,7 +140,7 @@ class WriteCardActivity : AppCompatActivity() {
     private fun setToolbarRightBtnFinish() =
         imv_toolbar_right.setImageResource(R.drawable.toolbar_active)
 
-    private fun initCardSize(){
+    private fun initCardSize() {
         val margin = 35.px
         cardLayout.setPadding(margin, 0, margin, 8)
     }
