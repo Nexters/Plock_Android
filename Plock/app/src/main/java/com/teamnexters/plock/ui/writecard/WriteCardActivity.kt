@@ -20,6 +20,9 @@ import java.util.*
 import android.provider.MediaStore
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
+import com.teamnexters.plock.extensions.toast
+import kotlinx.android.synthetic.main.card_back.*
 
 
 private const val PICK_FROM_ALBUM = 1
@@ -35,7 +38,7 @@ class WriteCardActivity : AppCompatActivity() {
 
     lateinit var viewModel: WriteCardViewModel
 
-    private lateinit var selectedImage: Uri
+    private var selectedImage: Uri = "".toUri()
 
     private lateinit var rightOutAnim: AnimatorSet
     private lateinit var leftInAnim: AnimatorSet
@@ -58,16 +61,18 @@ class WriteCardActivity : AppCompatActivity() {
         initCardSize()
         loadFlipAnimations()
 
+
         cardPhotoIv.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = MediaStore.Images.Media.CONTENT_TYPE
-            startActivityForResult(intent, PICK_FROM_ALBUM)
+            if (!isBackVisible) {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.type = MediaStore.Images.Media.CONTENT_TYPE
+                startActivityForResult(intent, PICK_FROM_ALBUM)
+            }
         }
 
         imv_toolbar_left.setOnClickListener {
             if (isBackVisible) {
                 flipToFront()
-                setToolbarRightBtnNext()
             } else {
                 finish()
             }
@@ -76,12 +81,24 @@ class WriteCardActivity : AppCompatActivity() {
         imv_toolbar_right.setOnClickListener {
             if (!isBackVisible) {
                 flipToBack()
-                setToolbarRightBtnFinish()
             } else {
 //                showFinalCheckDialog()
-                saveCard()
+                if (checkWriteAll()) saveCard()
             }
         }
+    }
+
+    private fun checkWriteAll(): Boolean {
+        var infoMsg = ""
+        if (selectedImage.toString().isEmpty()) infoMsg = "사진을 선택해주세요"
+         else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
+
+        if(infoMsg.isNotEmpty()){
+            toast(infoMsg)
+            flipToFront()
+            return false
+        }
+        return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -94,7 +111,10 @@ class WriteCardActivity : AppCompatActivity() {
     }
 
     private fun saveCard() {
-        val timeCapsule = TimeCapsule("제목", Date(), "장소", 37.541, 126.986, selectedImage.toString(), "룰루랄라")
+        val timeCapsule = TimeCapsule(
+            cardTitleEditTv.text.toString(), Date(), placeNameTv.text.toString(),
+            37.541, 126.986, selectedImage.toString(), cardMessageEditTv.text.toString()
+        )
         disposables += viewModel.saveTimeCapsule(timeCapsule)
         start(MainActivity::class)
     }
@@ -109,6 +129,7 @@ class WriteCardActivity : AppCompatActivity() {
         leftOutAnim.start()
         leftInAnim.start()
         isBackVisible = true
+        setToolbarRightBtnFinish()
     }
 
     private fun flipToFront() {
@@ -117,6 +138,7 @@ class WriteCardActivity : AppCompatActivity() {
         rightOutAnim.start()
         rightInAnim.start()
         isBackVisible = false
+        setToolbarRightBtnNext()
     }
 
     private fun loadFlipAnimations() {
