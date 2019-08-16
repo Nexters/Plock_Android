@@ -60,9 +60,9 @@
 
         <View
             android:id="@+id/centerView"
-            android:layout_width="2dp"
+            android:layout_width="1dp"
             android:layout_height="76dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/gray4"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@+id/showCardLayout"
