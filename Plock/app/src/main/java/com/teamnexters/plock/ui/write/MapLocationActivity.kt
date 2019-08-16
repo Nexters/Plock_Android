@@ -5,8 +5,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,12 +30,19 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.teamnexters.plock.R
+import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.util.MapTools
 import kotlinx.android.synthetic.main.activity_map_location.*
 import kotlinx.android.synthetic.main.bottom_sheet_map.*
-import org.jetbrains.anko.startActivity
+import java.io.IOException
+import java.util.*
 
-class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapLocationActivity : AppCompatActivity(),
+    GoogleMap.OnCameraMoveCanceledListener,
+    GoogleMap.OnCameraIdleListener,
+    GoogleMap.OnCameraMoveListener,
+    GoogleMap.OnCameraMoveStartedListener,
+    OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -41,6 +50,9 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var lastKnownLocation: Location
     private lateinit var locationCallback: LocationCallback
     private val LOCATION_RESULT_CODE = 100
+
+    private lateinit var geoCoder: Geocoder
+    private var a = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,13 +63,68 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         initFusedLocation()
         initMapFragment()
         initBottomSheet()
+        geoCoder = Geocoder(applicationContext, Locale.KOREAN)
 
-        sheet_custom_layout.setOnClickListener { startActivity<FindLocationActivity>() }
+        sheet_custom_layout.setOnClickListener { start(FindLocationActivity::class) }
         fab_map_location.setOnClickListener { checkGPS() }
+        cardBtn.setOnClickListener {  }
+    }
+
+    override fun onCameraMoveCanceled() {
+        Log.e("camera", "camera move canceled")
+    }
+
+    override fun onCameraIdle() {
+        Log.e("camera", "camera has stopped moving")
+        if (a == 0) {
+            a++
+        } else {
+            val latitude = mMap.cameraPosition.target.latitude
+            val longitude = mMap.cameraPosition.target.longitude
+            Log.e("lat", "$latitude + $longitude")
+            try {
+                val mResultList = geoCoder.getFromLocation(
+                    latitude,
+                    longitude,
+                    1
+                )
+                if (mResultList != null && mResultList.size > 0) {
+                    cardETxt.text = mResultList[0].getAddressLine(0)
+                    Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Log.e("address", "주소 변환 실패")
+            }
+        }
+    }
+
+    override fun onCameraMove() {
+//        Log.e("camera", "camera is moving")
+    }
+
+    override fun onCameraMoveStarted(reason: Int) {
+        when (reason) {
+            // 유저 제스처에 따라
+            GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE -> Log.e("camera", "The user gestured on the map")
+            GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION -> Log.e(
+                "camera",
+                "The user tapped something on the map"
+            )
+            // 앱이 카메라 움직임 시작했을 때
+            GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION -> Log.e(
+                "camera",
+                "The app moved the camera"
+            )
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = MapTools.configActivityMaps(googleMap)
+        mMap.setOnCameraIdleListener(this)
+        mMap.setOnCameraMoveCanceledListener(this)
+        mMap.setOnCameraMoveStartedListener(this)
+        mMap.setOnCameraMoveListener(this)
         checkGPS()
     }
 
@@ -72,6 +139,7 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
     /*
     * 기기의 현재 위치를 가져오는 메소드
     * 현재 위치를 가져오기 위해서 fused location client provider 사용
@@ -88,9 +156,20 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
                             mMap.animateCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude),
-                                    17F
+                                    16F
                                 )
                             )
+                            try {
+                                val mResultList = geoCoder.getFromLocation(
+                                    lastKnownLocation.latitude,
+                                    lastKnownLocation.longitude,
+                                    1
+                                )
+                                Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
+                            } catch (e: IOException) {
+                                e.printStackTrace()
+                                Log.e("address", "주소 변환 실패")
+                            }
                         } else {
                             /*
                             *   2가지 생성 ( location request & callback )
@@ -130,16 +209,7 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
                             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
                         }
-                    }
-                    else {
-//                        mMap.animateCamera(
-//                            CameraUpdateFactory.newLatLngZoom(
-//                                LatLng(
-//                                    37.5665,
-//                                    126.9776
-//                                ), 17F
-//                            )
-//                        )
+                    } else {
                         Toast.makeText(applicationContext, "Unable to get last Location", Toast.LENGTH_SHORT).show()
                         checkPermission()
                     }
@@ -182,8 +252,8 @@ class MapLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         *  PRIORITY_HIGH_ACCURACY = 배터리 소모 고려하지 않고 정확도 최우선
         */
         val locationRequest: LocationRequest = LocationRequest.create()
-        locationRequest.interval = 4000
-        locationRequest.fastestInterval = 3000
+        locationRequest.interval = 5000
+        locationRequest.fastestInterval = 4000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         /*

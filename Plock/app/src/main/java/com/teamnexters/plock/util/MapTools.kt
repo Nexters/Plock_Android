@@ -7,8 +7,6 @@ class MapTools {
         fun configActivityMaps(googleMap: GoogleMap): GoogleMap {
             // set map type
             googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-            // Enable / Disable zooming controls
-            googleMap.uiSettings.isZoomControlsEnabled = true
 
             // Enable / Disable Compass icon
             googleMap.uiSettings.isCompassEnabled = false
