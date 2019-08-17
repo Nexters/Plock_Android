@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.app.DatePickerDialog
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
@@ -23,6 +24,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.teamnexters.plock.extensions.toast
 import kotlinx.android.synthetic.main.card_back.*
+import java.text.SimpleDateFormat
 
 
 private const val PICK_FROM_ALBUM = 1
@@ -46,6 +48,10 @@ class WriteCardActivity : AppCompatActivity() {
     private lateinit var leftOutAnim: AnimatorSet
     private var isBackVisible = false
 
+    private var year = 0
+    private var month = 0
+    private var day = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write_card)
@@ -60,7 +66,9 @@ class WriteCardActivity : AppCompatActivity() {
         initToolbar()
         initCardSize()
         loadFlipAnimations()
+        setUpTodayDate()
 
+        cardDateLayout.setOnClickListener { showDatePickerDialog() }
 
         cardPhotoIv.setOnClickListener {
             if (!isBackVisible) {
@@ -88,12 +96,23 @@ class WriteCardActivity : AppCompatActivity() {
         }
     }
 
+    private fun showDatePickerDialog() {
+        val dpd = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            this.year = year
+            this.month = monthOfYear
+            this.day = dayOfMonth
+            cardDateTv.text = getDateStr()
+        }, year, month, day)
+
+        dpd.show()
+    }
+
     private fun checkWriteAll(): Boolean {
         var infoMsg = ""
         if (selectedImage.toString().isEmpty()) infoMsg = "사진을 선택해주세요"
-         else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
+        else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
 
-        if(infoMsg.isNotEmpty()){
+        if (infoMsg.isNotEmpty()) {
             toast(infoMsg)
             flipToFront()
             return false
@@ -112,7 +131,7 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun saveCard() {
         val timeCapsule = TimeCapsule(
-            cardTitleEditTv.text.toString(), Date(), placeNameTv.text.toString(),
+            cardTitleEditTv.text.toString(), getDate(), placeNameTv.text.toString(),
             37.541, 126.986, selectedImage.toString(), cardMessageEditTv.text.toString()
         )
         disposables += viewModel.saveTimeCapsule(timeCapsule)
@@ -121,6 +140,14 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun showFinalCheckDialog() {
 
+    }
+
+    private fun setUpTodayDate() {
+        val c = Calendar.getInstance()
+        year = c.get(Calendar.YEAR)
+        month = c.get(Calendar.MONTH)
+        day = c.get(Calendar.DAY_OF_MONTH)
+        cardDateTv.text = getDateStr()
     }
 
     private fun flipToBack() {
@@ -154,6 +181,15 @@ class WriteCardActivity : AppCompatActivity() {
         val scale = resources.displayMetrics.density * distance
         cardFront.cameraDistance = scale
         cardBack.cameraDistance = scale
+    }
+
+    private fun getDateStr(): String {
+        return "$year.${month + 1}.$day"
+    }
+
+    private fun getDate(): Date {
+        val selectDate = SimpleDateFormat("yyyy.MM.dd").parse(getDateStr())
+        return selectDate ?: Date()
     }
 
     private fun setToolbarRightBtnNext() =

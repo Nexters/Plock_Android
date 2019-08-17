@@ -9,6 +9,8 @@ import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import kotlinx.android.synthetic.main.card_back.view.*
 import kotlinx.android.synthetic.main.card_front.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CardPagerAdapter(private val showTimeCapsuleList: List<TimeCapsule>) : PagerAdapter() {
 
@@ -25,12 +27,17 @@ class CardPagerAdapter(private val showTimeCapsuleList: List<TimeCapsule>) : Pag
             with(item){
                 cardTitleTv.text = title
                 cardMessageTv.text = message
+                cardDateTv.text = getDateStr(date)
                 cardPhotoIv.setImageURI(photo.toUri())
             }
         }
 
         container?.addView(cardView)
         return cardView
+    }
+
+    private fun getDateStr(date :Date) : String {
+        return SimpleDateFormat("yyyy.MM.dd").format(date)
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
