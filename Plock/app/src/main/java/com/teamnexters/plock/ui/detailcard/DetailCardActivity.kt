@@ -3,17 +3,16 @@ package com.teamnexters.plock.ui.detailcard
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
-import com.teamnexters.plock.extensions.runOnIoScheduler
 import com.teamnexters.plock.rx.AutoClearedDisposable
-import com.teamnexters.plock.ui.writecard.WriteCardViewModel
-import com.teamnexters.plock.ui.writecard.WriteCardViewModelFactory
 import kotlinx.android.synthetic.main.activity_detail_card.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
+import java.util.*
+
+
 
 class DetailCardActivity : AppCompatActivity() {
     internal val disposables = AutoClearedDisposable(this)
@@ -29,7 +28,7 @@ class DetailCardActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detail_card)
+        setContentView(com.teamnexters.plock.R.layout.activity_detail_card)
         initToolbar()
         initCardSize()
 
@@ -40,15 +39,15 @@ class DetailCardActivity : AppCompatActivity() {
         lifecycle += disposables
         lifecycle += viewDisposables
 
-
-        // 임시 : 열람하기-리스트 구현 완료되면 intent로 데이터 받아오기
-        runOnIoScheduler {
-            list = ArrayList(provideTimeCapsuleDao(this).loadAllTimeCapsule())
-            runOnUiThread {
-                adapter = CardPagerAdapter(this, list)
-                cardViewPager.adapter = adapter
-            }
+        if (intent.extras != null) {
+            list = intent.getSerializableExtra("list") as ArrayList<TimeCapsule>
         }
+
+        runOnUiThread {
+            adapter = CardPagerAdapter(this, list)
+            cardViewPager.adapter = adapter
+        }
+
 
         imv_toolbar_right.setOnClickListener {
             deleteCard()
@@ -75,7 +74,7 @@ class DetailCardActivity : AppCompatActivity() {
     }
 
     private fun initToolbar() {
-        imv_toolbar_right.setImageResource(R.drawable.ic_delete)
+        imv_toolbar_right.setImageResource(com.teamnexters.plock.R.drawable.ic_delete)
         imv_toolbar_left.setOnClickListener { finish() }
     }
 }

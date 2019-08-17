@@ -1,17 +1,15 @@
 package com.teamnexters.plock.ui.detailcard
 
-import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat
 import androidx.viewpager.widget.PagerAdapter
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
-import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.card_back.view.*
 import kotlinx.android.synthetic.main.card_front.view.*
 import kotlinx.android.synthetic.main.item_card.view.*
@@ -77,10 +75,10 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
     }
 
     private fun loadFlipAnimations() {
-        rightOutAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_right_out) as AnimatorSet
-        leftInAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_left_in) as AnimatorSet
-        leftOutAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_left_out) as AnimatorSet
-        rightInAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_right_in) as AnimatorSet
+        rightOutAnim = AnimatorInflaterCompat.loadAnimator(context, R.animator.anim_flip_right_out) as AnimatorSet
+        leftInAnim = AnimatorInflaterCompat.loadAnimator(context, R.animator.anim_flip_left_in) as AnimatorSet
+        leftOutAnim = AnimatorInflaterCompat.loadAnimator(context, R.animator.anim_flip_left_out) as AnimatorSet
+        rightInAnim = AnimatorInflaterCompat.loadAnimator(context, R.animator.anim_flip_right_in) as AnimatorSet
     }
 
     private fun changeCameraDistance(cardView: View) {

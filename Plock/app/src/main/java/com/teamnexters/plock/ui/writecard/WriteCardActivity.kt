@@ -1,33 +1,35 @@
 package com.teamnexters.plock.ui.writecard
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
-import com.teamnexters.plock.R
-import com.teamnexters.plock.data.provideTimeCapsuleDao
-import kotlinx.android.synthetic.main.activity_write_card.*
-import kotlinx.android.synthetic.main.toolbar_custom.*
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.MediaStore
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import androidx.lifecycle.ViewModelProviders
+import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
+import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
 import com.teamnexters.plock.extensions.start
+import com.teamnexters.plock.extensions.toast
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import com.teamnexters.plock.ui.main.MainActivity
-import kotlinx.android.synthetic.main.card_front.*
-import java.util.*
-import android.provider.MediaStore
-import android.content.Intent
-import android.net.Uri
-import androidx.core.net.toUri
-import com.teamnexters.plock.extensions.toast
+import com.teamnexters.plock.ui.write.MapLocationActivity
+import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.card_back.*
+import kotlinx.android.synthetic.main.card_front.*
+import kotlinx.android.synthetic.main.toolbar_custom.*
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 private const val PICK_FROM_ALBUM = 1
+private const val GET_LOCATION_CODE = 100
 
 class WriteCardActivity : AppCompatActivity() {
     internal val disposables = AutoClearedDisposable(this)
@@ -51,6 +53,10 @@ class WriteCardActivity : AppCompatActivity() {
     private var year = 0
     private var month = 0
     private var day = 0
+
+    private var lat = 0.0
+    private var long = 0.0
+    private var locationName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +100,11 @@ class WriteCardActivity : AppCompatActivity() {
                 if (checkWriteAll()) saveCard()
             }
         }
+
+        changePlaceLayout.setOnClickListener {
+            val intent = Intent(applicationContext, MapLocationActivity::class.java)
+            startActivityForResult(intent, GET_LOCATION_CODE)
+        }
     }
 
     private fun showDatePickerDialog() {
@@ -121,10 +132,17 @@ class WriteCardActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             PICK_FROM_ALBUM -> {
                 selectedImage = data?.data ?: return
                 cardPhotoIv.setImageURI(selectedImage)
+            }
+            GET_LOCATION_CODE -> {
+                lat = data?.extras?.getDouble("lat")!!
+                long = data.extras?.getDouble("long")!!
+                locationName = data.extras?.getString("location")!!
+                placeNameTv.text = locationName
             }
         }
     }
@@ -132,7 +150,7 @@ class WriteCardActivity : AppCompatActivity() {
     private fun saveCard() {
         val timeCapsule = TimeCapsule(
             cardTitleEditTv.text.toString(), getDate(), placeNameTv.text.toString(),
-            37.541, 126.986, selectedImage.toString(), cardMessageEditTv.text.toString()
+            lat, long, selectedImage.toString(), cardMessageEditTv.text.toString()
         )
         disposables += viewModel.saveTimeCapsule(timeCapsule)
         start(MainActivity::class)
