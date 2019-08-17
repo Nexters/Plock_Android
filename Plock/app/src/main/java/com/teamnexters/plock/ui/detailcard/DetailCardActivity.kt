@@ -1,14 +1,19 @@
 package com.teamnexters.plock.ui.detailcard
 
+import android.app.AlertDialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import kotlinx.android.synthetic.main.activity_detail_card.*
+import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import java.util.*
 
@@ -50,8 +55,7 @@ class DetailCardActivity : AppCompatActivity() {
 
 
         imv_toolbar_right.setOnClickListener {
-            deleteCard()
-            adapter.notifyDataSetChanged()
+            showDeleteDialog()
         }
     }
 
@@ -61,9 +65,32 @@ class DetailCardActivity : AppCompatActivity() {
         list.remove(deleteItem)
 
         if (list.size == 0) finish()
+        adapter.notifyDataSetChanged()
     }
 
-    private fun initCardSize(){
+    private fun showDeleteDialog() {
+        layoutInflater.inflate(R.layout.dialog_two_button, null).run {
+            val dialog = AlertDialog.Builder(this@DetailCardActivity)
+                .setView(this)
+                .show()
+
+            val width = (resources.displayMetrics.widthPixels * 0.60).toInt()
+            val height = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            dialog.window?.apply {
+                setLayout(width, height)
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+
+            okBtn.text = "삭제"
+            okBtn.setOnClickListener {
+                deleteCard()
+                dialog.dismiss()
+            }
+            cancelBtn.setOnClickListener { dialog.dismiss() }
+        }
+    }
+
+    private fun initCardSize() {
         val margin = 35.px
 
         cardViewPager.run {

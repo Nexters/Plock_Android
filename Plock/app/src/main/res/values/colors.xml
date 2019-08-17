@@ -13,6 +13,7 @@
     <color name="gray2">#495057</color>
     <color name="gray3">#868e96</color>
     <color name="gray4">#adb5bd</color>
+    <color name="gray5">#e9ecef</color>
 
     <!-- toolbar -->
     <color name="white_80">#cdffffff</color>
