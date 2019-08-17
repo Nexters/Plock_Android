@@ -2,6 +2,7 @@ package com.teamnexters.plock.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import java.util.*
 
@@ -17,4 +18,6 @@ data class TimeCapsule(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
+
+    @Ignore var isBackVisible: Boolean = false
 }

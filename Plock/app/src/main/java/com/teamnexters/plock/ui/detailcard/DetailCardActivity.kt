@@ -45,7 +45,7 @@ class DetailCardActivity : AppCompatActivity() {
         runOnIoScheduler {
             list = ArrayList(provideTimeCapsuleDao(this).loadAllTimeCapsule())
             runOnUiThread {
-                adapter = CardPagerAdapter(list)
+                adapter = CardPagerAdapter(this, list)
                 cardViewPager.adapter = adapter
             }
         }
