@@ -55,6 +55,7 @@ class MapLocationActivity : AppCompatActivity(),
     private var a = 0
     private var latitude = 0.0
     private var longitude = 0.0
+    private var locationName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +70,14 @@ class MapLocationActivity : AppCompatActivity(),
 
         sheet_custom_layout.setOnClickListener { start(FindLocationActivity::class) }
         fab_map_location.setOnClickListener { checkGPS() }
-        cardBtn.setOnClickListener {  }
+        cardBtn.setOnClickListener {
+            val intent = Intent()
+            intent.putExtra("lat", latitude)
+            intent.putExtra("long", longitude)
+            intent.putExtra("location", locationName)
+            setResult(100, intent)
+            finish()
+        }
     }
 
     override fun onCameraMoveCanceled() {
@@ -92,6 +100,7 @@ class MapLocationActivity : AppCompatActivity(),
                 )
                 if (mResultList != null && mResultList.size > 0) {
                     cardETxt.text = mResultList[0].getAddressLine(0)
+                    locationName = mResultList[0].getAddressLine(0)
                     Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
                 }
             } catch (e: IOException) {
@@ -173,15 +182,6 @@ class MapLocationActivity : AppCompatActivity(),
                                 cardETxt.text = address
                                 Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
                                 Log.e("address", "주소 = ${mResultList[0].featureName}")
-                                Log.e("address", "주소 = ${mResultList[0].countryName}")
-                                Log.e("address", "주소 = ${mResultList[0].adminArea}")
-                                Log.e("address", "주소 = ${mResultList[0].extras}")
-                                Log.e("address", "주소 = ${mResultList[0].locale}")
-                                Log.e("address", "주소 = ${mResultList[0].locality}")
-                                Log.e("address", "주소 = ${mResultList[0].postalCode}")
-                                Log.e("address", "주소 = ${mResultList[0].subAdminArea}")
-                                Log.e("address", "주소 = ${mResultList[0].subThoroughfare}")
-
 
                             } catch (e: IOException) {
                                 e.printStackTrace()
