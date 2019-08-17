@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.teamnexters.plock.R
 
 class FindLocationAdapter(
@@ -18,7 +19,15 @@ class FindLocationAdapter(
     }
 
     override fun getItemCount(): Int {
-        return 7
+        return suggestionList.size
+    }
+
+    fun addItem(prediction: AutocompletePrediction) {
+        suggestionList.add(prediction.getFullText(null).toString())
+    }
+
+    fun clearItem() {
+        suggestionList.clear()
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {

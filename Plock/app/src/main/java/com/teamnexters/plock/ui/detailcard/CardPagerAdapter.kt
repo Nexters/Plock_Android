@@ -3,15 +3,14 @@ package com.teamnexters.plock.ui.detailcard
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat
 import androidx.viewpager.widget.PagerAdapter
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
-import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.card_back.view.*
 import kotlinx.android.synthetic.main.card_front.view.*
 import kotlinx.android.synthetic.main.item_card.view.*

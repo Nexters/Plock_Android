@@ -1,6 +1,7 @@
 package com.teamnexters.plock.ui.show.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +9,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
-import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.ui.detailcard.DetailCardActivity
+import kotlinx.android.synthetic.main.show_list_item.view.*
 
 class ShowListAdapter(
     private val items: ArrayList<TimeCapsule>,
@@ -33,7 +34,13 @@ class ShowListAdapter(
         val parentLayout = itemView?.findViewById<ConstraintLayout>(R.id.parent_layout_list_item)
 
         fun bindList(showListModel: TimeCapsule) {
-            parentLayout?.setOnClickListener { context?.start(DetailCardActivity::class) }
+            itemView.txv_title_show_list.text = showListModel.title
+            itemView.txv_date_show_list.text = showListModel.date.toString()
+            parentLayout?.setOnClickListener {
+                val intent = Intent(context, DetailCardActivity::class.java)
+                intent.putExtra("list", items)
+                context?.startActivity(intent)
+            }
         }
     }
 }

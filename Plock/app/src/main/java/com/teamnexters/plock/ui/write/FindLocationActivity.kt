@@ -38,6 +38,7 @@ class FindLocationActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                adapter.clearItem()
                 val predictionsRequest =
                     FindAutocompletePredictionsRequest.builder()
                         .setTypeFilter(TypeFilter.ADDRESS)
@@ -54,9 +55,9 @@ class FindLocationActivity : AppCompatActivity() {
                             val prediction: AutocompletePrediction = predictionList[index]
                             suggestionList.add(prediction.getFullText(null).toString())
                             Log.e("list", prediction.getFullText(null).toString())
-                            adapter.notifyItemInserted(0)
-                            //adapter.notifyDataSetChanged()
+                            adapter.addItem(prediction)
                         }
+                        adapter.notifyDataSetChanged()
                     }
                 }
             }
