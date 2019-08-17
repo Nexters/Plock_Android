@@ -25,9 +25,7 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
         loadFlipAnimations()
     }
 
-    private lateinit var rightOutAnim: AnimatorSet
     private lateinit var leftInAnim: AnimatorSet
-    private lateinit var rightInAnim: AnimatorSet
     private lateinit var leftOutAnim: AnimatorSet
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val cardView = LayoutInflater.from(container?.context).inflate(R.layout.item_card, container, false)
@@ -77,10 +75,8 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
     }
 
     private fun loadFlipAnimations() {
-        rightOutAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_right_out) as AnimatorSet
         leftInAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_left_in) as AnimatorSet
         leftOutAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_left_out) as AnimatorSet
-        rightInAnim = AnimatorInflater.loadAnimator(context, R.animator.anim_flip_right_in) as AnimatorSet
     }
 
     private fun changeCameraDistance(cardView: View) {

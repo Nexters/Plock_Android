@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bg_dialog_radius_10"
+              android:weightSum="6">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="8dp">
+
+        <ImageView
+                android:id="@+id/dialogIv"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/ic_img_person_delete"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="잠시만요!"
+                android:textSize="14sp"
+                android:textColor="@color/gray2"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="4dp"/>
+
+        <TextView
+                android:id="@+id/msgTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="삭제된 일기는 되돌릴 수 없어요.\n일기를 삭제하겠습니까?"
+                android:textSize="12sp"
+                android:textColor="@color/gray2"
+                android:gravity="center"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+          android:background="@color/gray5"/>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/cancelBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textColor="@color/mainBlue"
+                android:text="아니요"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+        <View android:layout_width="1dp" android:layout_height="match_parent"
+              android:background="@color/gray5"/>
+
+        <TextView
+                android:id="@+id/okBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textColor="@color/gray4"
+                android:text="네"
+                android:textStyle="bold"
+                android:gravity="center"/>
+    </LinearLayout>
+</LinearLayout>
