@@ -24,11 +24,22 @@
 
     <!--Floating action button-->
     <dimen name="design_fab_image_size" tools:override="true">30dp</dimen>
+    <dimen name="fab_write_margin_bottom">20dp</dimen>
+    <dimen name="fab_write_margin_right">18dp</dimen>
 
     <!-- marker -->
     <dimen name="imv_alram_height">74dp</dimen>
     <dimen name="imv_alram_width">64dp</dimen>
+    
+    <!-- show list -->
+    <dimen name="show_list_height">220dp</dimen>
+    <dimen name="show_list_width">164dp</dimen>
+    <dimen name="show_list_margin_left">12dp</dimen>
+    <dimen name="show_list_margin_top">13dp</dimen>
 
     <dimen name="card_content_margin_left">26dp</dimen>
     <dimen name="card_content_margin_right">20dp</dimen>
+
+    <dimen name="radio_button_conner_radius">5dp</dimen>
+    <dimen name="radio_button_stroke_border">1dp</dimen>
 </resources>
