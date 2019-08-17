@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import java.io.Serializable
 import java.util.*
 
 @Entity(tableName = "time_capsule")
@@ -15,7 +16,7 @@ data class TimeCapsule(
     val longitude: Double,
     val photo: String,
     val message: String?
-) {
+) : Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
