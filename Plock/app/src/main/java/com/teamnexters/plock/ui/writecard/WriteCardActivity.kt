@@ -9,7 +9,9 @@ import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.Dialog
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
@@ -20,10 +22,13 @@ import kotlinx.android.synthetic.main.card_front.*
 import java.util.*
 import android.provider.MediaStore
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import androidx.core.net.toUri
 import com.teamnexters.plock.extensions.toast
 import kotlinx.android.synthetic.main.card_back.*
+import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import java.text.SimpleDateFormat
 
 
@@ -90,8 +95,7 @@ class WriteCardActivity : AppCompatActivity() {
             if (!isBackVisible) {
                 flipToBack()
             } else {
-//                showFinalCheckDialog()
-                if (checkWriteAll()) saveCard()
+                if (checkWriteAll()) showSaveDialog()
             }
         }
     }
@@ -138,8 +142,32 @@ class WriteCardActivity : AppCompatActivity() {
         start(MainActivity::class)
     }
 
-    private fun showFinalCheckDialog() {
+    private fun showSaveDialog() {
+        layoutInflater.inflate(R.layout.dialog_two_button, null).run {
+            val dialog = AlertDialog.Builder(this@WriteCardActivity)
+                .setView(this)
+                .show()
 
+            setUpDialogSize(dialog)
+            titleTv.text = "기억해주세요!"
+            msgTv.text = getString(R.string.dialog_save_msg)
+            okBtn.text = "저장"
+            dialogIv.setImageDrawable(getDrawable(R.drawable.img_person_save))
+            cancelBtn.setOnClickListener { dialog.dismiss() }
+            okBtn.setOnClickListener {
+                saveCard()
+                dialog.dismiss()
+            }
+        }
+    }
+
+    private fun setUpDialogSize(dialog: Dialog) {
+        val width = (resources.displayMetrics.widthPixels * 0.60).toInt()
+        val height = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        dialog.window?.apply {
+            setLayout(width, height)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
     }
 
     private fun setUpTodayDate() {

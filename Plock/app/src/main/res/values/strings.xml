@@ -7,4 +7,7 @@
 
     <string name="hint_card_name">장소 이름을 지어주세요.</string>
     <string name="hint_card_message">다양한 이야기를 담아주세요.</string>
+
+    <string name="dialog_save_msg">현재 작성한 일기는 설정한\n위치에서만 확인, 삭제가 가능해요!\n계속하시겠습니까?</string>
+    <string name="dialog_delete_msg">삭제된 일기는 되돌릴 수 없어요.\n일기를 삭제하겠습니까?</string>
 </resources>

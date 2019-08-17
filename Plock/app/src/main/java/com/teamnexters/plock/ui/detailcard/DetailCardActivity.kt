@@ -75,19 +75,22 @@ class DetailCardActivity : AppCompatActivity() {
                 .setView(this)
                 .show()
 
-            val width = (resources.displayMetrics.widthPixels * 0.60).toInt()
-            val height = (resources.displayMetrics.widthPixels * 0.85).toInt()
-            dialog.window?.apply {
-                setLayout(width, height)
-                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            }
-
+            setUpDialogSize(dialog)
             okBtn.text = "삭제"
+            cancelBtn.setOnClickListener { dialog.dismiss() }
             okBtn.setOnClickListener {
                 deleteCard()
                 dialog.dismiss()
             }
-            cancelBtn.setOnClickListener { dialog.dismiss() }
+        }
+    }
+
+    private fun setUpDialogSize(dialog: Dialog){
+        val width = (resources.displayMetrics.widthPixels * 0.60).toInt()
+        val height = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        dialog.window?.apply {
+            setLayout(width, height)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
     }
 
