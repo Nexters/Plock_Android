@@ -53,6 +53,8 @@ class MapLocationActivity : AppCompatActivity(),
 
     private lateinit var geoCoder: Geocoder
     private var a = 0
+    private var latitude = 0.0
+    private var longitude = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,8 +81,8 @@ class MapLocationActivity : AppCompatActivity(),
         if (a == 0) {
             a++
         } else {
-            val latitude = mMap.cameraPosition.target.latitude
-            val longitude = mMap.cameraPosition.target.longitude
+            latitude = mMap.cameraPosition.target.latitude
+            longitude = mMap.cameraPosition.target.longitude
             Log.e("lat", "$latitude + $longitude")
             try {
                 val mResultList = geoCoder.getFromLocation(
@@ -165,7 +167,22 @@ class MapLocationActivity : AppCompatActivity(),
                                     lastKnownLocation.longitude,
                                     1
                                 )
+//                                cardETxt.text = mResultList[0].toString()
+                                val splitStr = mResultList[0].toString().split(",")
+                                val address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length - 2)
+                                cardETxt.text = address
                                 Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
+                                Log.e("address", "주소 = ${mResultList[0].featureName}")
+                                Log.e("address", "주소 = ${mResultList[0].countryName}")
+                                Log.e("address", "주소 = ${mResultList[0].adminArea}")
+                                Log.e("address", "주소 = ${mResultList[0].extras}")
+                                Log.e("address", "주소 = ${mResultList[0].locale}")
+                                Log.e("address", "주소 = ${mResultList[0].locality}")
+                                Log.e("address", "주소 = ${mResultList[0].postalCode}")
+                                Log.e("address", "주소 = ${mResultList[0].subAdminArea}")
+                                Log.e("address", "주소 = ${mResultList[0].subThoroughfare}")
+
+
                             } catch (e: IOException) {
                                 e.printStackTrace()
                                 Log.e("address", "주소 변환 실패")
