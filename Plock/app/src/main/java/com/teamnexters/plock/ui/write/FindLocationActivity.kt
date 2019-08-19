@@ -72,7 +72,7 @@ class FindLocationActivity : AppCompatActivity() {
 
     private fun initPlaceApi() {
         // Initialize the SDK
-        Places.initialize(applicationContext, "AIzaSyBM83L9S7bUzGz0oZuLndHV2Z_i-NGEn48")
+        Places.initialize(applicationContext, "")
 
         // Create a new Places client instance
         placesClient = Places.createClient(this)
