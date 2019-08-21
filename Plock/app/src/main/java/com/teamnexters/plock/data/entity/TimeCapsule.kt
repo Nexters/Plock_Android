@@ -14,7 +14,7 @@ data class TimeCapsule(
     @ColumnInfo(name = "place_name") val placeName: String,
     val latitude: Double,
     val longitude: Double,
-    val photo: String,
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB) val photo: ByteArray,
     val message: String?
 ) : Serializable {
     @PrimaryKey(autoGenerate = true)

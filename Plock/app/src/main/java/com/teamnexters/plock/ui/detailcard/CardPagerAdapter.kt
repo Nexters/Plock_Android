@@ -3,11 +3,11 @@ package com.teamnexters.plock.ui.detailcard
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
-import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat
 import androidx.viewpager.widget.PagerAdapter
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
@@ -17,8 +17,7 @@ import kotlinx.android.synthetic.main.item_card.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CardPagerAdapter(private val context: Context, private val showTimeCapsuleList: List<TimeCapsule>) :
-    PagerAdapter() {
+class CardPagerAdapter(private val context: Context, private val showTimeCapsuleList: List<TimeCapsule>) : PagerAdapter() {
 
     init {
         loadFlipAnimations()
@@ -43,13 +42,13 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
                 cardTitleTv.text = title
                 cardMessageTv.text = message
                 cardDateTv.text = getDateStr(date)
-                cardPhotoIv.setImageURI(photo.toUri())
+                cardPhotoIv.setImageBitmap(byteArrayToBitmap(photo))
             }
 
             setOnClickListener {
                 if (!item.isBackVisible)
                     flipToBack(findViewWithTag<View>(position), position)
-                else if(item.isBackVisible)
+                else if (item.isBackVisible)
                     flipToFront(findViewWithTag<View>(position), position)
             }
         }
@@ -87,6 +86,10 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
 
     private fun getDateStr(date: Date): String {
         return SimpleDateFormat("yyyy.MM.dd").format(date)
+    }
+
+    private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {

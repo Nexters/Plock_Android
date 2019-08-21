@@ -18,8 +18,6 @@ import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import java.util.*
 
-
-
 class DetailCardActivity : AppCompatActivity() {
     internal val disposables = AutoClearedDisposable(this)
 
@@ -34,7 +32,7 @@ class DetailCardActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.teamnexters.plock.R.layout.activity_detail_card)
+        setContentView(R.layout.activity_detail_card)
         initToolbar()
         initCardSize()
 
@@ -105,7 +103,7 @@ class DetailCardActivity : AppCompatActivity() {
     }
 
     private fun initToolbar() {
-        imv_toolbar_right.setImageResource(com.teamnexters.plock.R.drawable.ic_delete)
+        imv_toolbar_right.setImageResource(R.drawable.ic_delete)
         imv_toolbar_left.setOnClickListener { finish() }
     }
 }

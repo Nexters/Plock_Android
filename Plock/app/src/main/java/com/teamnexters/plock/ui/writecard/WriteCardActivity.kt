@@ -4,11 +4,9 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProviders
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.provideTimeCapsuleDao
@@ -16,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_write_card.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import android.app.AlertDialog
 import android.app.Dialog
+import android.graphics.Bitmap
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
@@ -28,10 +27,10 @@ import java.util.*
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import kotlinx.android.synthetic.main.card_back.*
-import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import com.teamnexters.plock.ui.write.MapLocationActivity
+import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import java.text.SimpleDateFormat
-
+import java.io.ByteArrayOutputStream
 
 private const val PICK_FROM_ALBUM = 1
 private const val GET_LOCATION_CODE = 100
@@ -47,7 +46,7 @@ class WriteCardActivity : AppCompatActivity() {
 
     lateinit var viewModel: WriteCardViewModel
 
-    private var selectedImage: Uri = "".toUri()
+    private lateinit var selectedImage: Bitmap
 
     private lateinit var rightOutAnim: AnimatorSet
     private lateinit var leftInAnim: AnimatorSet
@@ -111,36 +110,14 @@ class WriteCardActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDatePickerDialog() {
-        val dpd = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-            this.year = year
-            this.month = monthOfYear
-            this.day = dayOfMonth
-            cardDateTv.text = getDateStr()
-        }, year, month, day)
-
-        dpd.show()
-    }
-
-    private fun checkWriteAll(): Boolean {
-        var infoMsg = ""
-        if (selectedImage.toString().isEmpty()) infoMsg = "사진을 선택해주세요"
-        else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
-
-        if (infoMsg.isNotEmpty()) {
-            toast(infoMsg)
-            flipToFront()
-            return false
-        }
-        return true
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             PICK_FROM_ALBUM -> {
-                selectedImage = data?.data ?: return
-                cardPhotoIv.setImageURI(selectedImage)
+                val uri = data?.data ?: return
+                selectedImage = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                cardPhotoIv.setImageBitmap(selectedImage)
+
             }
             GET_LOCATION_CODE -> {
                 lat = data?.extras?.getDouble("lat")!!
@@ -154,7 +131,7 @@ class WriteCardActivity : AppCompatActivity() {
     private fun saveCard() {
         val timeCapsule = TimeCapsule(
             cardTitleEditTv.text.toString(), getDate(), placeNameTv.text.toString(),
-            lat, long, selectedImage.toString(), cardMessageEditTv.text.toString()
+            lat, long, bitmapToByteArray(), cardMessageEditTv.text.toString()
         )
         disposables += viewModel.saveTimeCapsule(timeCapsule)
         start(MainActivity::class)
@@ -179,13 +156,15 @@ class WriteCardActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUpDialogSize(dialog: Dialog) {
-        val width = (resources.displayMetrics.widthPixels * 0.60).toInt()
-        val height = (resources.displayMetrics.widthPixels * 0.85).toInt()
-        dialog.window?.apply {
-            setLayout(width, height)
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+    private fun showDatePickerDialog() {
+        val dpd = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            this.year = year
+            this.month = monthOfYear
+            this.day = dayOfMonth
+            cardDateTv.text = getDateStr()
+        }, year, month, day)
+
+        dpd.show()
     }
 
     private fun setUpTodayDate() {
@@ -194,6 +173,28 @@ class WriteCardActivity : AppCompatActivity() {
         month = c.get(Calendar.MONTH)
         day = c.get(Calendar.DAY_OF_MONTH)
         cardDateTv.text = getDateStr()
+    }
+
+    private fun checkWriteAll(): Boolean {
+        var infoMsg = ""
+        if (selectedImage.toString().isEmpty()) infoMsg = "사진을 선택해주세요"
+        else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
+
+        if (infoMsg.isNotEmpty()) {
+            toast(infoMsg)
+            flipToFront()
+            return false
+        }
+        return true
+    }
+
+    private fun setUpDialogSize(dialog: Dialog) {
+        val width = (resources.displayMetrics.widthPixels * 0.60).toInt()
+        val height = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        dialog.window?.apply {
+            setLayout(width, height)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
     }
 
     private fun flipToBack() {
@@ -236,6 +237,12 @@ class WriteCardActivity : AppCompatActivity() {
     private fun getDate(): Date {
         val selectDate = SimpleDateFormat("yyyy.MM.dd").parse(getDateStr())
         return selectDate ?: Date()
+    }
+
+    private fun bitmapToByteArray(): ByteArray {
+        val stream = ByteArrayOutputStream()
+        selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
     }
 
     private fun setToolbarRightBtnNext() =
