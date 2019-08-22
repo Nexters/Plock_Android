@@ -6,6 +6,7 @@
         android:layout_width="match_parent" android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/frontCardLayout"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -93,7 +94,7 @@
                         android:padding="3dp"
                         app:srcCompat="@drawable/ic_arrow_right"
                         android:tint="@color/gray4"
-                android:visibility="gone"/>
+                        android:visibility="gone"/>
             </LinearLayout>
 
             <EditText
@@ -149,6 +150,16 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <ImageView
+                android:id="@+id/flipBtnInFront"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_flip"
+                app:layout_constraintRight_toRightOf="@+id/frontCardLayout"
+                app:layout_constraintBottom_toBottomOf="@id/frontCardLayout"
+                android:layout_margin="24dp"
+                android:padding="12dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

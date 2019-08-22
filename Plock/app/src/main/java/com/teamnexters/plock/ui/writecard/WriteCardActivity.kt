@@ -47,11 +47,9 @@ class WriteCardActivity : AppCompatActivity() {
 
     lateinit var viewModel: WriteCardViewModel
 
-    private lateinit var selectedImage: Bitmap
+    private var selectedImage: Bitmap? = null
 
-    private lateinit var rightOutAnim: AnimatorSet
     private lateinit var leftInAnim: AnimatorSet
-    private lateinit var rightInAnim: AnimatorSet
     private lateinit var leftOutAnim: AnimatorSet
     private var isBackVisible = false
 
@@ -79,6 +77,7 @@ class WriteCardActivity : AppCompatActivity() {
         loadFlipAnimations()
         setUpTodayDate()
 
+        cardMessageEditTv.visibility = View.VISIBLE
         cardDateLayout.setOnClickListener { showDatePickerDialog() }
 
         cardPhotoIv.setOnClickListener {
@@ -89,21 +88,11 @@ class WriteCardActivity : AppCompatActivity() {
             }
         }
 
-        imv_toolbar_left.setOnClickListener {
-            if (isBackVisible) {
-                flipToFront()
-            } else {
-                finish()
-            }
-        }
+        flipBtnInFront.setOnClickListener { flipToBack() }
+        flipBtnInBack.setOnClickListener { flipToFront() }
 
-        imv_toolbar_right.setOnClickListener {
-            if (!isBackVisible) {
-                flipToBack()
-            } else {
-                if (checkWriteAll()) showSaveDialog()
-            }
-        }
+        imv_toolbar_left.setOnClickListener { finish() }
+        imv_toolbar_right.setOnClickListener { if (checkWriteAll()) showSaveDialog() }
 
         changePlaceLayout.setOnClickListener {
             val intent = Intent(applicationContext, MapLocationActivity::class.java)
@@ -118,7 +107,7 @@ class WriteCardActivity : AppCompatActivity() {
                 val uri = data?.data ?: return
                 selectedImage = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
                 cardPhotoIv.setImageBitmap(selectedImage)
-                if(plusIv.visibility == View.VISIBLE) plusIv.visibility = View.GONE
+                if (plusIv.visibility == View.VISIBLE) plusIv.visibility = View.GONE
             }
             GET_LOCATION_CODE -> {
                 lat = data?.extras?.getDouble("lat")!!
@@ -178,12 +167,12 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun checkWriteAll(): Boolean {
         var infoMsg = ""
-        if (selectedImage.toString().isEmpty()) infoMsg = "사진을 선택해주세요"
+        if (selectedImage == null) infoMsg = "사진을 선택해주세요"
         else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
 
         if (infoMsg.isNotEmpty()) {
             toast(infoMsg)
-            flipToFront()
+            if (isBackVisible) flipToFront()
             return false
         }
         return true
@@ -204,23 +193,19 @@ class WriteCardActivity : AppCompatActivity() {
         leftOutAnim.start()
         leftInAnim.start()
         isBackVisible = true
-        setToolbarRightBtnFinish()
     }
 
     private fun flipToFront() {
-        rightOutAnim.setTarget(cardBack)
-        rightInAnim.setTarget(cardFront)
-        rightOutAnim.start()
-        rightInAnim.start()
+        leftOutAnim.setTarget(cardBack)
+        leftInAnim.setTarget(cardFront)
+        leftOutAnim.start()
+        leftInAnim.start()
         isBackVisible = false
-        setToolbarRightBtnNext()
     }
 
     private fun loadFlipAnimations() {
-        rightOutAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_right_out) as AnimatorSet
         leftInAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_left_in) as AnimatorSet
         leftOutAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_left_out) as AnimatorSet
-        rightInAnim = AnimatorInflater.loadAnimator(this, R.animator.anim_flip_right_in) as AnimatorSet
         changeCameraDistance()
     }
 
@@ -242,15 +227,9 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun bitmapToByteArray(): ByteArray {
         val stream = ByteArrayOutputStream()
-        selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        selectedImage?.compress(Bitmap.CompressFormat.PNG, 100, stream)
         return stream.toByteArray()
     }
-
-    private fun setToolbarRightBtnNext() =
-        imv_toolbar_right.setImageResource(R.drawable.ic_arrow_right)
-
-    private fun setToolbarRightBtnFinish() =
-        imv_toolbar_right.setImageResource(R.drawable.toolbar_active)
 
     private fun initCardSize() {
         val margin = 35.px
@@ -259,6 +238,6 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun initToolbar() {
         tv_toolbar_center.text = "작성"
-        setToolbarRightBtnNext()
+        imv_toolbar_right.setImageResource(R.drawable.ic_check)
     }
 }
