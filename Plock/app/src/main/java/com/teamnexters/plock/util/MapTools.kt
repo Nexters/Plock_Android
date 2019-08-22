@@ -17,6 +17,7 @@ class MapTools {
 
             googleMap.uiSettings.isScrollGesturesEnabled = true
             googleMap.uiSettings.isMapToolbarEnabled = true
+            googleMap.uiSettings.isMyLocationButtonEnabled = true
 
             return googleMap
         }

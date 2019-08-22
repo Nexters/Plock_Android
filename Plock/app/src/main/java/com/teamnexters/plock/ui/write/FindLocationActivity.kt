@@ -15,12 +15,13 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.teamnexters.plock.R
 import kotlinx.android.synthetic.main.activity_find_location.*
 
+
 class FindLocationActivity : AppCompatActivity() {
 
     private lateinit var placesClient: PlacesClient
     private lateinit var predictionList: List<AutocompletePrediction>
-    private lateinit var token: AutocompleteSessionToken
     private lateinit var adapter: FindLocationAdapter
+    private lateinit var strList: ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,36 +31,39 @@ class FindLocationActivity : AppCompatActivity() {
         initPlaceApi()
         initRvAdapter()
 
-        find_location_editText.addTextChangedListener(object: TextWatcher {
+        find_location_editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
+                val predictionsRequest =
+                    FindAutocompletePredictionsRequest.builder()
+                        .setCountry("pk")
+                        .setTypeFilter(TypeFilter.ADDRESS)
+                        .setSessionToken(AutocompleteSessionToken.newInstance())
+                        .setQuery(p0.toString())
+                        .build()
+                // then we need to pass predictionsRequest to places API
+                placesClient.findAutocompletePredictions(predictionsRequest).addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        val result = it.result
+                        if (result != null) {
+                            predictionList = result.autocompletePredictions
+                            val suggestionList = ArrayList<String>()
+                            for (i in predictionList.indices) {
+                                val prediction = predictionList[i]
+                                suggestionList.add(prediction.getFullText(null).toString())
+                            }
+                            adapter.filterList(suggestionList)
+                        }
+                    }
+                }.addOnFailureListener {
+                    Log.e("failure", it.message!!)
+                    adapter.notifyDataSetChanged()
+                }
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                adapter.clearItem()
-                val predictionsRequest =
-                    FindAutocompletePredictionsRequest.builder()
-                        .setTypeFilter(TypeFilter.ADDRESS)
-                        .setSessionToken(token)
-                        .setQuery(p0?.toString())
-                        .build()
-
-                // then we need to pass predictionsRequest to places API
-                placesClient.findAutocompletePredictions(predictionsRequest).addOnSuccessListener {
-                    if (it != null) {
-                        predictionList = it.autocompletePredictions
-                        val suggestionList = java.util.ArrayList<String>()
-                        for (index in predictionList.indices) {
-                            val prediction: AutocompletePrediction = predictionList[index]
-                            suggestionList.add(prediction.getFullText(null).toString())
-                            Log.e("list", prediction.getFullText(null).toString())
-                            adapter.addItem(prediction)
-                        }
-                        adapter.notifyDataSetChanged()
-                    }
-                }
             }
 
         })
@@ -71,18 +75,16 @@ class FindLocationActivity : AppCompatActivity() {
     }
 
     private fun initPlaceApi() {
-        // Initialize the SDK
-        Places.initialize(applicationContext, "")
+//      Initialize the SDK
+        Places.initialize(applicationContext, getString(R.string.geo_api_key))
 
         // Create a new Places client instance
         placesClient = Places.createClient(this)
-
-        token = AutocompleteSessionToken.newInstance()
     }
 
     private fun initRvAdapter() {
-        val strList = ArrayList<String>()
-        adapter = FindLocationAdapter(strList, applicationContext)
+        strList = ArrayList()
+        adapter = FindLocationAdapter(this, strList)
         rv_find_location.adapter = adapter
     }
 }

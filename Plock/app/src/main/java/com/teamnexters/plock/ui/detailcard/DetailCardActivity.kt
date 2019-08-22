@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.teamnexters.plock.R
@@ -45,6 +46,7 @@ class DetailCardActivity : AppCompatActivity() {
 
         if (intent.extras != null) {
             list = intent.getSerializableExtra("list") as ArrayList<TimeCapsule>
+            Log.e("list", "$list")
         }
 
         runOnUiThread {

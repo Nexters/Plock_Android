@@ -96,6 +96,7 @@ class WriteCardActivity : AppCompatActivity() {
 
         changePlaceLayout.setOnClickListener {
             val intent = Intent(applicationContext, MapLocationActivity::class.java)
+
             startActivityForResult(intent, GET_LOCATION_CODE)
         }
     }

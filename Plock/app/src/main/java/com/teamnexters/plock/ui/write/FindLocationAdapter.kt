@@ -1,50 +1,54 @@
 package com.teamnexters.plock.ui.write
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.teamnexters.plock.R
 
+
 class FindLocationAdapter(
-    private val suggestionList: ArrayList<String>,
-    private val context: Context?
+    private val context: Context?,
+    private var strList: ArrayList<String>
 ) : RecyclerView.Adapter<FindLocationAdapter.ListViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
-        return ListViewHolder(LayoutInflater.from(context).inflate(R.layout.find_location_item, parent, false))
+        return ListViewHolder(
+            LayoutInflater.from(context).inflate(
+                R.layout.find_location_item,
+                parent,
+                false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
-        return suggestionList.size
-    }
-
-    fun addItem(prediction: AutocompletePrediction) {
-        suggestionList.add(prediction.getFullText(null).toString())
-    }
-
-    fun clearItem() {
-        suggestionList.clear()
+        return strList.size
     }
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
-        if (suggestionList.size == 0) {
-            Log.e("size", "Exception")
+        if (strList.size == 0) {
         } else {
-            holder.bindList(suggestionList[position])
+            holder.fullTitle?.text = strList[position]
+            holder.subTitle?.text = strList[position]
         }
+    }
+
+    fun filterList(lst: ArrayList<String>) {
+        strList = lst
+        notifyDataSetChanged()
+    }
+
+    fun clearList() {
+        strList.clear()
+        notifyDataSetChanged()
     }
 
     inner class ListViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
 
-        val txv_fullTitle = itemView?.findViewById<AppCompatTextView>(R.id.txv_fullTitle)
-        val txv_subTitle = itemView?.findViewById<AppCompatTextView>(R.id.txv_subTitle)
-
-        fun bindList(str: String) {
-            txv_fullTitle?.text = str
-        }
+        val fullTitle = itemView?.findViewById<AppCompatTextView>(R.id.txv_fullTitle)
+        val subTitle = itemView?.findViewById<AppCompatTextView>(R.id.txv_subTitle)
     }
 }

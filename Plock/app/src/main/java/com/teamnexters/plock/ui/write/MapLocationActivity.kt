@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
+import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,14 +25,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionDeniedResponse
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.single.PermissionListener
 import com.teamnexters.plock.R
 import com.teamnexters.plock.extensions.start
+import com.teamnexters.plock.util.CheckLocationPermission
 import com.teamnexters.plock.util.MapTools
 import kotlinx.android.synthetic.main.activity_map_location.*
 import kotlinx.android.synthetic.main.bottom_sheet_map.*
@@ -62,7 +59,6 @@ class MapLocationActivity : AppCompatActivity(),
         setContentView(R.layout.activity_map_location)
 
         initToolbar()
-        checkPermission()
         initFusedLocation()
         initMapFragment()
         initBottomSheet()
@@ -81,17 +77,14 @@ class MapLocationActivity : AppCompatActivity(),
     }
 
     override fun onCameraMoveCanceled() {
-        Log.e("camera", "camera move canceled")
     }
 
     override fun onCameraIdle() {
-        Log.e("camera", "camera has stopped moving")
         if (a == 0) {
             a++
         } else {
             latitude = mMap.cameraPosition.target.latitude
             longitude = mMap.cameraPosition.target.longitude
-            Log.e("lat", "$latitude + $longitude")
             try {
                 val mResultList = geoCoder.getFromLocation(
                     latitude,
@@ -105,13 +98,11 @@ class MapLocationActivity : AppCompatActivity(),
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
-                Log.e("address", "주소 변환 실패")
             }
         }
     }
 
     override fun onCameraMove() {
-//        Log.e("camera", "camera is moving")
     }
 
     override fun onCameraMoveStarted(reason: Int) {
@@ -146,7 +137,15 @@ class MapLocationActivity : AppCompatActivity(),
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == LOCATION_RESULT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                getDeviceLocation()
+                if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+                    getDeviceLocation()
+                } else {
+                    CheckLocationPermission.checkPermission(this, mMap, null)
+                }
+            } else {
+                finish()
             }
         }
     }
@@ -164,36 +163,38 @@ class MapLocationActivity : AppCompatActivity(),
                     if (task.isSuccessful) {
                         if (task.result != null) {
                             lastKnownLocation = task.result!!
-                            mMap.animateCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude),
-                                    16F
-                                )
-                            )
+                            latitude = lastKnownLocation.latitude
+                            longitude = lastKnownLocation.longitude
+
                             try {
                                 val mResultList = geoCoder.getFromLocation(
                                     lastKnownLocation.latitude,
                                     lastKnownLocation.longitude,
                                     1
                                 )
-//                                cardETxt.text = mResultList[0].toString()
-                                val splitStr = mResultList[0].toString().split(",")
-                                val address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,splitStr[0].length - 2)
-                                cardETxt.text = address
-                                Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
-                                Log.e("address", "주소 = ${mResultList[0].featureName}")
+
+                                if (mResultList != null && mResultList.size > 0) {
+                                    cardETxt.text = mResultList[0].getAddressLine(0)
+                                    locationName = mResultList[0].getAddressLine(0)
+                                }
 
                             } catch (e: IOException) {
                                 e.printStackTrace()
-                                Log.e("address", "주소 변환 실패")
                             }
+
+                            mMap.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude),
+                                    17F
+                                )
+                            )
                         } else {
                             /*
                             *   2가지 생성 ( location request & callback )
                             */
                             val locationRequest: LocationRequest = LocationRequest.create()
-                            locationRequest.interval = 4000
-                            locationRequest.fastestInterval = 3000
+                            locationRequest.interval = 10000
+                            locationRequest.fastestInterval = 5000
                             locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
                             /*
@@ -210,6 +211,25 @@ class MapLocationActivity : AppCompatActivity(),
                                     }
 
                                     lastKnownLocation = result.lastLocation
+                                    latitude = lastKnownLocation.latitude
+                                    longitude = lastKnownLocation.longitude
+
+                                    try {
+                                        val mResultList = geoCoder.getFromLocation(
+                                            lastKnownLocation.latitude,
+                                            lastKnownLocation.longitude,
+                                            1
+                                        )
+
+                                        if (mResultList != null && mResultList.size > 0) {
+                                            cardETxt.text = mResultList[0].getAddressLine(0)
+                                            locationName = mResultList[0].getAddressLine(0)
+                                        }
+
+                                    } catch (e: IOException) {
+                                        e.printStackTrace()
+                                    }
+
                                     mMap.animateCamera(
                                         CameraUpdateFactory.newLatLngZoom(
                                             LatLng(
@@ -218,6 +238,7 @@ class MapLocationActivity : AppCompatActivity(),
                                             ), 17F
                                         )
                                     )
+
                                     /*
                                     *   위치 업데이트를 제거하는 것 중요! ( prevent recursion of location updates )
                                     */
@@ -228,61 +249,33 @@ class MapLocationActivity : AppCompatActivity(),
                         }
                     } else {
                         Toast.makeText(applicationContext, "Unable to get last Location", Toast.LENGTH_SHORT).show()
-                        checkPermission()
+                        //CheckLocationPermission.checkPermission(this@MapLocationActivity, mMap, null)
+                        //checkPermission()
                     }
                 }
 
             })
-    }
-
-    // 앱 내 위치 권한
-    private fun checkPermission() {
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-            .withListener(object : PermissionListener {
-                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                    Toast.makeText(applicationContext, "Permission Granted!!", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    permission: PermissionRequest?,
-                    token: PermissionToken?
-                ) {
-                    token?.continuePermissionRequest()
-                }
-
-                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-                    if (response?.isPermanentlyDenied!!) {
-                        Toast.makeText(applicationContext, "Permission Denied permanently", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(applicationContext, "Permission Denied once", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
-            .check()
     }
 
     private fun checkGPS() {
-        /*
-        *  interval = 위치 업데이트 주기
-        *  fastestInterval = 위치 획득 후 업데이트 주기
-        *  PRIORITY_HIGH_ACCURACY = 배터리 소모 고려하지 않고 정확도 최우선
-        */
         val locationRequest: LocationRequest = LocationRequest.create()
-        locationRequest.interval = 5000
-        locationRequest.fastestInterval = 4000
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = 5000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
-        /*
-        *  Gps off일 때 LocationSettingsRequest 로 설정창을 띄움
-        *  & Location 세팅
-        */
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
         val settingsClient: SettingsClient = LocationServices.getSettingsClient(this)
         val task: Task<LocationSettingsResponse> = settingsClient.checkLocationSettings(builder.build())
 
-        /* 활성화 & 비활성화 시 */
-        task.addOnSuccessListener { getDeviceLocation() }
+        task.addOnSuccessListener {
+            if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                getDeviceLocation()
+            } else {
+                CheckLocationPermission.checkPermission(this, mMap, null)
+            }
+        }
         task.addOnFailureListener {
             if (it is ResolvableApiException) {
                 val resolvable: ResolvableApiException = it
@@ -314,7 +307,6 @@ class MapLocationActivity : AppCompatActivity(),
     private fun initBottomSheet() {
         val bottomSheetLayout: LinearLayoutCompat = findViewById(R.id.bottom_sheet)
         val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
-        // change the state of the bottom sheet
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 }
