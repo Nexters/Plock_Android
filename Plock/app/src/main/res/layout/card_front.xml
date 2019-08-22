@@ -16,24 +16,58 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageView
-                android:id="@+id/cardPhotoIv"
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cardPhotoLayout"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/white"
                 app:layout_constraintDimensionRatio="H,1:1.25"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginRight="22dp"
                 android:layout_marginLeft="22dp"
-                android:layout_marginTop="40dp"
-                android:scaleType="centerCrop"/>
+                android:layout_marginTop="40dp">
+
+            <ImageView
+                    android:id="@+id/cardPhotoIv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#eeeeee"
+                    android:scaleType="centerCrop"/>
+
+            <ImageView
+                    android:id="@+id/plusIv"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_plus"
+                    android:padding="20dp"
+                    android:background="#bdbdbd"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/cardPhotoIv"
+                    app:layout_constraintBottom_toBottomOf="@id/cardPhotoIv"/>
+
+            <View android:layout_width="1dp" android:layout_height="match_parent"
+                  android:background="#1A000000"
+                  app:layout_constraintLeft_toLeftOf="@+id/cardPhotoIv"/>
+
+            <View android:layout_width="1dp" android:layout_height="match_parent"
+                  android:background="#1A000000"
+                  app:layout_constraintRight_toRightOf="@+id/cardPhotoIv"/>
+
+            <View android:layout_width="match_parent" android:layout_height="2dp"
+                  android:background="#26000000"
+                  app:layout_constraintTop_toTopOf="@+id/cardPhotoIv"/>
+
+            <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                  android:background="#1A000000"
+                  app:layout_constraintBottom_toBottomOf="@+id/cardPhotoIv"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/cardPhotoIv"
+                app:layout_constraintTop_toBottomOf="@+id/cardPhotoLayout"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginBottom="8dp"
                 android:orientation="vertical"
@@ -58,7 +92,8 @@
                         android:layout_height="18dp"
                         android:padding="3dp"
                         app:srcCompat="@drawable/ic_arrow_right"
-                        android:tint="@color/gray4"/>
+                        android:tint="@color/gray4"
+                android:visibility="gone"/>
             </LinearLayout>
 
             <EditText
@@ -109,7 +144,8 @@
                         android:layout_height="18dp"
                         android:padding="3dp"
                         app:srcCompat="@drawable/ic_arrow_right"
-                        android:tint="@color/gray4"/>
+                        android:tint="@color/gray4"
+                        android:visibility="gone"/>
             </LinearLayout>
 
         </LinearLayout>

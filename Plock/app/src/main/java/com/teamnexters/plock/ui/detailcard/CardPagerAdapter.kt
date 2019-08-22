@@ -34,8 +34,7 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
             cardTitleEditTv.visibility = View.GONE
             cardTitleTv.visibility = View.VISIBLE
             cardMessageEditTv.visibility = View.GONE
-            changeDateIv.visibility = View.GONE
-            changePlaceIv.visibility = View.GONE
+            plusIv.visibility = View.GONE
 
             val item = showTimeCapsuleList[position]
             with(item) {

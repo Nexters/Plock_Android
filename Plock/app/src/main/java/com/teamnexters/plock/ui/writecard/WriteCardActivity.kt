@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.card_front.*
 import java.util.*
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.view.View
 import kotlinx.android.synthetic.main.card_back.*
 import com.teamnexters.plock.ui.write.MapLocationActivity
 import kotlinx.android.synthetic.main.dialog_two_button.view.*
@@ -117,7 +118,7 @@ class WriteCardActivity : AppCompatActivity() {
                 val uri = data?.data ?: return
                 selectedImage = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
                 cardPhotoIv.setImageBitmap(selectedImage)
-
+                if(plusIv.visibility == View.VISIBLE) plusIv.visibility = View.GONE
             }
             GET_LOCATION_CODE -> {
                 lat = data?.extras?.getDouble("lat")!!
