@@ -11,7 +11,6 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="W,8:11"
-            android:background="#99000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -21,9 +20,9 @@
 
         <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imv_picture_show_list"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/img_main_character"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -35,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="2019.07.14"
                 android:textSize="14sp"
-                android:textColor="@color/white"
+                android:textColor="@color/places_text_black_alpha_87"
                 android:layout_marginTop="@dimen/show_list_margin_top"
                 android:layout_marginStart="@dimen/show_list_margin_left"
                 app:layout_constraintTop_toTopOf="parent"
@@ -47,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:text="처음만난곳"
                 android:textSize="18sp"
-                android:textColor="@color/white"
+                android:textColor="@color/places_text_black_alpha_87"
                 app:layout_constraintTop_toBottomOf="@+id/txv_date_show_list"
                 app:layout_constraintLeft_toLeftOf="@+id/txv_date_show_list"/>
 

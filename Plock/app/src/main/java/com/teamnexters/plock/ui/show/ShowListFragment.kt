@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.teamnexters.plock.R
@@ -19,6 +18,7 @@ class ShowListFragment : Fragment() {
 
     lateinit var list : ArrayList<TimeCapsule>
     private lateinit var hashMap: HashMap<Location, ArrayList<TimeCapsule>>
+    private lateinit var hashMap2: HashMap<Int, ArrayList<TimeCapsule>>
 
     lateinit var hashArrayList: ArrayList<HashMap<Location, ArrayList<TimeCapsule>>>
 
@@ -42,9 +42,7 @@ class ShowListFragment : Fragment() {
                 hashMap[Location(i.latitude, i.longitude, i.date)] = arrayListOf(i)
             }
         }
-
-
-        return inflater.inflate(R.layout.fragment_show_list, container, false)
+        return view
 
     }
 
@@ -52,13 +50,15 @@ class ShowListFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         when {
             list.size > 0 -> {
-                show_list_layout.background = null
+                show_list_layout.setImageResource(0)
+                show_list_empty_txv.text = null
                 val adapter = ShowListAdapter(hashMap, context)
                 //val adapter = ShowListAdapter(list, context)
                 rv_show_list.adapter = adapter
             }
             else -> {
-                show_list_layout.background = ContextCompat.getDrawable(context!!, R.drawable.alarm)
+                show_list_layout.setImageResource(R.drawable.ic_list_empty)
+                show_list_empty_txv.text = "아직 기록된 카드가 없어요..."
             }
         }
 

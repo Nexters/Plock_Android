@@ -2,36 +2,36 @@ package com.teamnexters.plock.ui.writecard
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.teamnexters.plock.R
-import com.teamnexters.plock.data.provideTimeCapsuleDao
-import kotlinx.android.synthetic.main.activity_write_card.*
-import kotlinx.android.synthetic.main.toolbar_custom.*
-import android.app.AlertDialog
-import android.app.Dialog
-import android.graphics.Bitmap
 import com.teamnexters.plock.data.entity.TimeCapsule
+import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
 import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.extensions.toast
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import com.teamnexters.plock.ui.main.MainActivity
-import kotlinx.android.synthetic.main.card_front.*
-import java.util.*
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.View
-import kotlinx.android.synthetic.main.card_back.*
 import com.teamnexters.plock.ui.write.MapLocationActivity
+import kotlinx.android.synthetic.main.activity_write_card.*
+import kotlinx.android.synthetic.main.card_back.*
+import kotlinx.android.synthetic.main.card_front.*
 import kotlinx.android.synthetic.main.dialog_two_button.view.*
-import java.text.SimpleDateFormat
+import kotlinx.android.synthetic.main.toolbar_custom.*
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 private const val PICK_FROM_ALBUM = 1
 private const val GET_LOCATION_CODE = 100
@@ -96,7 +96,8 @@ class WriteCardActivity : AppCompatActivity() {
 
         changePlaceLayout.setOnClickListener {
             val intent = Intent(applicationContext, MapLocationActivity::class.java)
-
+            if (selectedImage != null) intent.putExtra("photo", bitmapToByteArrayToMap())
+            else intent.putExtra("photo", "null")
             startActivityForResult(intent, GET_LOCATION_CODE)
         }
     }
@@ -114,7 +115,8 @@ class WriteCardActivity : AppCompatActivity() {
                 lat = data?.extras?.getDouble("lat")!!
                 long = data.extras?.getDouble("long")!!
                 locationName = data.extras?.getString("location")!!
-                placeNameTv.text = locationName
+                if (locationName == "") placeNameTv.text = "롯데월드 에버랜드 가고싶다"
+                else placeNameTv.text = locationName
             }
         }
     }
@@ -126,6 +128,7 @@ class WriteCardActivity : AppCompatActivity() {
         )
         disposables += viewModel.saveTimeCapsule(timeCapsule)
         start(MainActivity::class)
+        finish()
     }
 
     private fun showSaveDialog() {
@@ -170,6 +173,7 @@ class WriteCardActivity : AppCompatActivity() {
         var infoMsg = ""
         if (selectedImage == null) infoMsg = "사진을 선택해주세요"
         else if (cardTitleEditTv.text.isEmpty()) infoMsg = "제목을 입력해주세요"
+        else if (lat.equals(0.0)) infoMsg = "장소를 선택해주세요"
 
         if (infoMsg.isNotEmpty()) {
             toast(infoMsg)
@@ -228,7 +232,13 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun bitmapToByteArray(): ByteArray {
         val stream = ByteArrayOutputStream()
-        selectedImage?.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        selectedImage?.compress(Bitmap.CompressFormat.JPEG, 60, stream)
+        return stream.toByteArray()
+    }
+
+    private fun bitmapToByteArrayToMap(): ByteArray {
+        val stream = ByteArrayOutputStream()
+        selectedImage?.compress(Bitmap.CompressFormat.JPEG, 20, stream)
         return stream.toByteArray()
     }
 
