@@ -76,9 +76,10 @@ class WriteCardActivity : AppCompatActivity() {
         initCardSize()
         loadFlipAnimations()
         setUpTodayDate()
+        setEditTvEnabled()
 
         cardMessageEditTv.visibility = View.VISIBLE
-        cardDateLayout.setOnClickListener { showDatePickerDialog() }
+        cardDateLayout.setOnClickListener { if (!isBackVisible) showDatePickerDialog() }
 
         cardPhotoIv.setOnClickListener {
             if (!isBackVisible) {
@@ -95,10 +96,12 @@ class WriteCardActivity : AppCompatActivity() {
         imv_toolbar_right.setOnClickListener { if (checkWriteAll()) showSaveDialog() }
 
         changePlaceLayout.setOnClickListener {
-            val intent = Intent(applicationContext, MapLocationActivity::class.java)
-            if (selectedImage != null) intent.putExtra("photo", bitmapToByteArrayToMap())
-            else intent.putExtra("photo", "null")
-            startActivityForResult(intent, GET_LOCATION_CODE)
+            if (!isBackVisible) {
+                val intent = Intent(applicationContext, MapLocationActivity::class.java)
+                if (selectedImage != null) intent.putExtra("photo", bitmapToByteArrayToMap())
+                else intent.putExtra("photo", "null")
+                startActivityForResult(intent, GET_LOCATION_CODE)
+            }
         }
     }
 
@@ -195,17 +198,32 @@ class WriteCardActivity : AppCompatActivity() {
     private fun flipToBack() {
         leftOutAnim.setTarget(cardFront)
         leftInAnim.setTarget(cardBack)
-        leftOutAnim.start()
-        leftInAnim.start()
+        startAnim()
         isBackVisible = true
+        setEditTvEnabled()
     }
 
     private fun flipToFront() {
         leftOutAnim.setTarget(cardBack)
         leftInAnim.setTarget(cardFront)
+        startAnim()
+        isBackVisible = false
+        setEditTvEnabled()
+    }
+
+    private fun startAnim() {
         leftOutAnim.start()
         leftInAnim.start()
-        isBackVisible = false
+    }
+
+    private fun setEditTvEnabled() {
+        cardPhotoIv.isClickable = !isBackVisible
+        cardTitleEditTv.isEnabled = !isBackVisible
+        cardMessageEditTv.isEnabled = isBackVisible
+        if (isBackVisible) {
+            cardMessageEditTv.isFocusableInTouchMode = true
+            cardMessageEditTv.requestFocus()
+        }
     }
 
     private fun loadFlipAnimations() {

@@ -40,7 +40,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.show.ShowActivity"/>
-        <activity android:name=".ui.writecard.WriteCardActivity"/>
+        <activity android:name=".ui.writecard.WriteCardActivity"
+                  android:windowSoftInputMode="stateAlwaysHidden"/>
         <activity android:name=".ui.detailcard.DetailCardActivity"/>
     </application>
 
