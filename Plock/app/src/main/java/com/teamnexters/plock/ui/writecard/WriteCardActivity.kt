@@ -11,6 +11,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.SpannableString
+import android.text.style.UnderlineSpan
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
@@ -118,8 +120,8 @@ class WriteCardActivity : AppCompatActivity() {
                 lat = data?.extras?.getDouble("lat")!!
                 long = data.extras?.getDouble("long")!!
                 locationName = data.extras?.getString("location")!!
-                if (locationName == "") placeNameTv.text = "롯데월드 에버랜드 가고싶다"
-                else placeNameTv.text = locationName
+                if (locationName == "") placeNameTv.text = getUnderLineStr("저장 위치를 선택해주세요.")
+                else placeNameTv.text = getUnderLineStr(locationName)
             }
         }
     }
@@ -158,7 +160,7 @@ class WriteCardActivity : AppCompatActivity() {
             this.year = year
             this.month = monthOfYear
             this.day = dayOfMonth
-            cardDateTv.text = getDateStr()
+            cardDateTv.text = getUnderLineStr(getDateStr())
         }, year, month, day)
 
         dpd.show()
@@ -169,7 +171,13 @@ class WriteCardActivity : AppCompatActivity() {
         year = c.get(Calendar.YEAR)
         month = c.get(Calendar.MONTH)
         day = c.get(Calendar.DAY_OF_MONTH)
-        cardDateTv.text = getDateStr()
+        cardDateTv.text = getUnderLineStr(getDateStr())
+    }
+
+    private fun getUnderLineStr(str: String): SpannableString {
+        val underLineStr = SpannableString(str)
+        underLineStr.setSpan(UnderlineSpan(), 0, str.length, 0)
+        return underLineStr
     }
 
     private fun checkWriteAll(): Boolean {

@@ -137,7 +137,7 @@
                         android:layout_weight="1"
                         android:textColor="@color/gray2"
                         android:textSize="12sp"
-                        android:text="롯데월드 에버랜드 가고싶다"/>
+                        android:text="저장 위치를 선택해주세요."/>
 
                 <ImageView
                         android:id="@+id/changePlaceIv"
