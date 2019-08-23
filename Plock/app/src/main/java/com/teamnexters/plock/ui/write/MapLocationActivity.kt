@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
@@ -58,6 +60,16 @@ class MapLocationActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_location)
 
+        // intent로 사진 정보 받기
+        val data = intent
+        if (data.extras?.get("photo")?.equals("null")!!) {
+            imv_picture_write_map.background = ContextCompat.getDrawable(applicationContext, R.drawable.ic_photo_empty)
+        } else {
+            val byteArray = data.getByteArrayExtra("photo")
+            val photo: Bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
+            imv_picture_write_map.setImageBitmap(photo)
+        }
+
         initToolbar()
         initFusedLocation()
         initMapFragment()
@@ -74,6 +86,15 @@ class MapLocationActivity : AppCompatActivity(),
             setResult(100, intent)
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent()
+        intent.putExtra("lat", 0.0)
+        intent.putExtra("long", 0.0)
+        intent.putExtra("location", "")
+        setResult(100, intent)
+        finish()
     }
 
     override fun onCameraMoveCanceled() {

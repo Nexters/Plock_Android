@@ -22,18 +22,20 @@
                 android:layout_width="@dimen/imv_alram_width"
                 android:layout_height="@dimen/imv_alram_height"
                 android:layout_centerInParent="true"
-                android:translationY="-50dp"
+                android:translationY="-48dp"
                 android:background="@drawable/alarm"
         >
 
             <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imv_picture_write_map"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="45dp"
+                    android:layout_height="44dp"
+                    android:scaleType="fitXY"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"/>
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginBottom="13dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
