@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
@@ -34,7 +36,6 @@ import com.teamnexters.plock.ui.detailcard.DetailCardActivity
 import com.teamnexters.plock.ui.show.model.Location
 import com.teamnexters.plock.util.CheckLocationPermission
 import com.teamnexters.plock.util.MapTools
-import kotlinx.android.synthetic.main.fragment_show_map.*
 
 class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnCameraMoveListener,
@@ -56,20 +57,45 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
     private lateinit var markerPhotoNum: AppCompatTextView
     private lateinit var hashMap: HashMap<Location, ArrayList<TimeCapsule>>
 
-    private lateinit var markerList: ArrayList<Marker>
-    private lateinit var saveMarker: Marker
+    private var saveMarker: HashMap<Location, MarkerOptions> = hashMapOf()
 
-    private val REQUESTING_LOCATION_UPDATES_KEY = 1
     private lateinit var lastKnownLocation: android.location.Location
 
     override fun onMarkerClick(p0: Marker?): Boolean {
-        activity?.let{
-            val intent = Intent(context, DetailCardActivity::class.java)
-            val loc = Location(p0?.position?.latitude!!, p0.position?.longitude!!, null)
-            intent.putExtra("list", hashMap[loc])
-            startActivity(intent)
+        if (((p0?.position?.latitude!! < lastKnownLocation.latitude + 0.01) && (p0.position?.longitude!! < lastKnownLocation.longitude + 0.01)
+                    && (p0.position?.latitude!! > lastKnownLocation.latitude - 0.01) && (p0.position.longitude > lastKnownLocation.longitude - 0.01))
+        ) {
+            activity?.let {
+                val intent = Intent(context, DetailCardActivity::class.java)
+                val loc = Location(p0.position?.latitude!!, p0.position?.longitude!!, null)
+                intent.putExtra("list", hashMap[loc])
+                startActivityForResult(intent, 5)
+            }
+        } else {
+            Toast.makeText(context, "근처로 이동해야 열람하실 수 있습니다!", Toast.LENGTH_SHORT).show()
         }
+
         return false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            5 -> {
+                // hashMap.clear()
+                if (data != null) {
+                    val intentList = data.getSerializableExtra("list") as ArrayList<TimeCapsule>
+                    for (i in intentList) {
+                        saveMarker.remove(Location(i.latitude, i.longitude, i.date))
+                    }
+                    //mMap.clear()
+                }
+
+                runOnIoScheduler {
+                    list = ArrayList(provideTimeCapsuleDao(context!!).loadAllTimeCapsule())
+                }
+
+            }
+        }
     }
 
     override fun onMyLocationButtonClick(): Boolean {
@@ -96,7 +122,7 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
                 CheckLocationPermission.checkPermission(activity!!, mMap, locationBtn)
             }
 
-            addMarker()
+            //addMarker()
 
         } else {
             Log.e("error", "Error loading google Map")
@@ -104,32 +130,25 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
 
     }
 
-    private fun addMarker() {
-        for (i in hashMap.keys) {
-            if (hashMap[i]?.size!! > 1) {
-                markerPhotoNum.visibility = View.VISIBLE
-                markerPhotoNum.text = hashMap[i]?.size!!.toString()
-            } else {
-                markerPhotoNum.visibility = View.INVISIBLE
-            }
-
-            val latLng = LatLng(i.latitude, i.longitude)
-            val markerOptions = MarkerOptions()
-            markerOptions.position(latLng)
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
-            saveMarker = mMap.addMarker(markerOptions)
-        }
-    }
-
     override fun onCameraMove() {
     }
 
     override fun onCameraIdle() {
-        startLocationUpdates()
+        // startLocationUpdates()
     }
 
     override fun onResume() {
         super.onResume()
+        Log.e("dd", "onResume")
+//        hashMap = hashMapOf()
+//        for (i in list) {
+//            Log.e("L", "LIST")
+//            if (hashMap.containsKey(Location(i.latitude, i.longitude, null))) {
+//                hashMap[Location(i.latitude, i.longitude, null)]?.add(i)
+//            } else {
+//                hashMap[Location(i.latitude, i.longitude, null)] = arrayListOf(i)
+//            }
+//        }
         startLocationUpdates()
     }
 
@@ -166,9 +185,11 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
+
+                lastKnownLocation = locationResult.lastLocation
+
                 for (location in locationResult.locations) {
                     mMap.clear()
-                    txv_show_map.text = "${location.latitude}"
 
                     for (i in hashMap.keys) {
                         if (((i.latitude < location.latitude + 0.01) && (i.longitude < location.longitude + 0.01)
@@ -186,12 +207,17 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
                             markerPhotoNum.visibility = View.INVISIBLE
                         }
 
+                        val byteArray = hashMap[i]?.get(0)?.photo
+                        val photo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
+                        markerPhoto.setImageBitmap(photo)
+
                         val latLng = LatLng(i.latitude, i.longitude)
                         val markerOptions = MarkerOptions()
                         markerOptions.position(latLng)
                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
 
-                        saveMarker = mMap.addMarker(markerOptions)
+                        mMap.addMarker(markerOptions)
+                        saveMarker[i] = markerOptions
                     }
 
                 }
@@ -206,20 +232,21 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
         mapFragment.getMapAsync(this)
         mapView = mapFragment.view!!
 
-        hashMap = hashMapOf()
-        for (i in list) {
-            if (hashMap.containsKey(Location(i.latitude, i.longitude, null))) {
-                hashMap[Location(i.latitude, i.longitude, null)]?.add(i)
-            } else {
-                hashMap[Location(i.latitude, i.longitude, null)] = arrayListOf(i)
-            }
-        }
         return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context!!)
+        hashMap = hashMapOf()
+        for (i in list) {
+            Log.e("L", "LIST")
+            if (hashMap.containsKey(Location(i.latitude, i.longitude, null))) {
+                hashMap[Location(i.latitude, i.longitude, null)]?.add(i)
+            } else {
+                hashMap[Location(i.latitude, i.longitude, null)] = arrayListOf(i)
+            }
+        }
         setFabVisible()
         setFabClickListener()
     }

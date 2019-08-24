@@ -12,7 +12,6 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -33,6 +32,7 @@ import com.teamnexters.plock.util.CheckLocationPermission
 import com.teamnexters.plock.util.MapTools
 import kotlinx.android.synthetic.main.activity_map_location.*
 import kotlinx.android.synthetic.main.bottom_sheet_map.*
+import kotlinx.android.synthetic.main.toolbar_custom.*
 import java.io.IOException
 import java.util.*
 
@@ -115,7 +115,6 @@ class MapLocationActivity : AppCompatActivity(),
                 if (mResultList != null && mResultList.size > 0) {
                     cardETxt.text = mResultList[0].getAddressLine(0)
                     locationName = mResultList[0].getAddressLine(0)
-                    Log.e("address", "주소 = ${mResultList[0].getAddressLine(0)}")
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -214,8 +213,8 @@ class MapLocationActivity : AppCompatActivity(),
                             *   2가지 생성 ( location request & callback )
                             */
                             val locationRequest: LocationRequest = LocationRequest.create()
-                            locationRequest.interval = 10000
-                            locationRequest.fastestInterval = 5000
+                            locationRequest.interval = 8000
+                            locationRequest.fastestInterval = 4000
                             locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
                             /*
@@ -280,8 +279,8 @@ class MapLocationActivity : AppCompatActivity(),
 
     private fun checkGPS() {
         val locationRequest: LocationRequest = LocationRequest.create()
-        locationRequest.interval = 10000
-        locationRequest.fastestInterval = 5000
+        locationRequest.interval = 8000
+        locationRequest.fastestInterval = 4000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
@@ -311,8 +310,15 @@ class MapLocationActivity : AppCompatActivity(),
     }
 
     private fun initToolbar() {
-        val textView = findViewById<TextView>(R.id.tv_toolbar_center)
-        textView.text = "위치 설정"
+        tv_toolbar_center.text = "위치 설정"
+        imv_toolbar_left.setOnClickListener {
+            val intent = Intent()
+            intent.putExtra("lat", 0.0)
+            intent.putExtra("long", 0.0)
+            intent.putExtra("location", "")
+            setResult(100, intent)
+            finish()
+        }
     }
 
     private fun initFusedLocation() {

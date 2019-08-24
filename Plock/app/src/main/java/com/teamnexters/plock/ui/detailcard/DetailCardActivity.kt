@@ -2,10 +2,10 @@ package com.teamnexters.plock.ui.detailcard
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.teamnexters.plock.R
@@ -17,7 +17,6 @@ import com.teamnexters.plock.rx.AutoClearedDisposable
 import kotlinx.android.synthetic.main.activity_detail_card.*
 import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
-import java.util.*
 
 class DetailCardActivity : AppCompatActivity() {
     internal val disposables = AutoClearedDisposable(this)
@@ -30,12 +29,15 @@ class DetailCardActivity : AppCompatActivity() {
     lateinit var viewModel: DetailCardViewModel
     lateinit var list: ArrayList<TimeCapsule>
     lateinit var adapter: CardPagerAdapter
+    private var tempList: ArrayList<TimeCapsule> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_card)
         initToolbar()
         initCardSize()
+
+        tempList.clear()
 
         viewModel = ViewModelProviders.of(
             this, viewModelFactory
@@ -46,7 +48,6 @@ class DetailCardActivity : AppCompatActivity() {
 
         if (intent.extras != null) {
             list = intent.getSerializableExtra("list") as ArrayList<TimeCapsule>
-            Log.e("list", "$list")
         }
 
         runOnUiThread {
@@ -63,9 +64,19 @@ class DetailCardActivity : AppCompatActivity() {
     private fun deleteCard() {
         val deleteItem = list.get(cardViewPager.currentItem)
         viewModel.deleteCard(deleteItem)
+        tempList.add(deleteItem)
         list.remove(deleteItem)
 
-        if (list.size == 0) finish()
+        val intent = Intent()
+
+        if (list.size == 0) {
+            intent.putExtra("list", tempList)
+            setResult(5, intent)
+            finish()
+        } else {
+            tempList.add(deleteItem)
+        }
+
         adapter.notifyDataSetChanged()
     }
 

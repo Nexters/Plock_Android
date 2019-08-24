@@ -24,8 +24,8 @@ class ShowActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_activity)
 
+        initToolbar()
         checkGPS()
-        checkPermission()
 
         segment_group_toolbar.setOnCheckedChangeListener(this)
         fabClickListener()
@@ -79,10 +79,6 @@ class ShowActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
         }
     }
 
-    private fun checkPermission() {
-        //CheckLocationPermission.checkPermission(this)
-    }
-
     private fun checkGPS() {
         val locationRequest: LocationRequest = LocationRequest.create()
         locationRequest.interval = 10000
@@ -109,5 +105,10 @@ class ShowActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
                 }
             }
         }
+    }
+
+    private fun initToolbar() {
+//        val textView = findViewById<AppCompatImageView>(R.id.imv_toolbar_back)
+        imv_toolbar_back.setOnClickListener { finish() }
     }
 }

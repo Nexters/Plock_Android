@@ -41,6 +41,7 @@ class CardPagerAdapter(private val context: Context, private val showTimeCapsule
                 cardTitleTv.text = title
                 cardMessageTv.text = message
                 cardDateTv.text = getDateStr(date)
+                placeNameTv.text = placeName
                 cardPhotoIv.setImageBitmap(byteArrayToBitmap(photo))
             }
 

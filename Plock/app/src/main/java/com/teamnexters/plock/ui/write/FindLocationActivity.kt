@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -14,6 +13,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.teamnexters.plock.R
 import kotlinx.android.synthetic.main.activity_find_location.*
+import kotlinx.android.synthetic.main.toolbar_custom.*
 
 
 class FindLocationActivity : AppCompatActivity() {
@@ -70,8 +70,8 @@ class FindLocationActivity : AppCompatActivity() {
     }
 
     private fun initToolbar() {
-        val textView = findViewById<TextView>(R.id.tv_toolbar_center)
-        textView.text = "위치 설정"
+        tv_toolbar_center.text = "위치 설정"
+        imv_toolbar_left.setOnClickListener { finish() }
     }
 
     private fun initPlaceApi() {
