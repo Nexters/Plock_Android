@@ -7,7 +7,6 @@
         android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/parent_layout_list_item"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintDimensionRatio="W,8:11"
@@ -28,13 +27,21 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"/>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/parent_layout_list_item"
+                android:background="#99000000"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txv_date_show_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2019.07.14"
                 android:textSize="14sp"
-                android:textColor="@color/places_text_black_alpha_87"
+                android:textColor="@color/white"
                 android:layout_marginTop="@dimen/show_list_margin_top"
                 android:layout_marginStart="@dimen/show_list_margin_left"
                 app:layout_constraintTop_toTopOf="parent"
@@ -46,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="처음만난곳"
                 android:textSize="18sp"
-                android:textColor="@color/places_text_black_alpha_87"
+                android:textColor="@color/white"
                 app:layout_constraintTop_toBottomOf="@+id/txv_date_show_list"
                 app:layout_constraintLeft_toLeftOf="@+id/txv_date_show_list"/>
 
@@ -56,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/show_list_margin_left"
                 android:layout_marginEnd="@dimen/show_list_margin_top"
-                android:src="@drawable/lock"
+                app:srcCompat="@drawable/lock"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 

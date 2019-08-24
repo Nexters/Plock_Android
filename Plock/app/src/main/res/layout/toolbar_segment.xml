@@ -21,6 +21,7 @@
                 android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imv_toolbar_back"
                     android:layout_width="@dimen/toolbar_image_size"
                     android:layout_height="@dimen/toolbar_image_size"
                     app:layout_constraintTop_toTopOf="parent"
