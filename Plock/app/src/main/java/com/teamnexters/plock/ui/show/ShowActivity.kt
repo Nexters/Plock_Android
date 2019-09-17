@@ -32,7 +32,10 @@ class ShowActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     }
 
     private fun fabClickListener() {
-        fab_write.setOnClickListener { start(WriteCardActivity::class) }
+        fab_write.setOnClickListener {
+            start(WriteCardActivity::class)
+            finish()
+        }
     }
 
     private fun changeFragment(id: Int) {
@@ -91,9 +94,7 @@ class ShowActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
 
         /* 활성화 & 비활성화 시 */
         task.addOnSuccessListener {
-            mFragmentManager.beginTransaction()
-                .add(R.id.fl_show, ShowMapFragment())
-                .commit()
+            mFragmentManager.beginTransaction().add(R.id.fl_show, ShowMapFragment()).commit()
         }
         task.addOnFailureListener {
             if (it is ResolvableApiException) {
@@ -108,7 +109,10 @@ class ShowActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     }
 
     private fun initToolbar() {
-//        val textView = findViewById<AppCompatImageView>(R.id.imv_toolbar_back)
         imv_toolbar_back.setOnClickListener { finish() }
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 }
