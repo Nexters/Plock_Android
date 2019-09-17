@@ -15,6 +15,7 @@ import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.runOnIoScheduler
+import com.teamnexters.plock.ui.detailcard.DetailCardActivity
 import com.teamnexters.plock.ui.show.adapter.ShowListAdapter
 import com.teamnexters.plock.ui.show.model.Location
 import kotlinx.android.synthetic.main.fragment_show_list.*
@@ -23,19 +24,17 @@ class ShowListFragment : Fragment() {
 
     lateinit var list: ArrayList<TimeCapsule>
     private lateinit var hashMap: LinkedHashMap<Location, ArrayList<TimeCapsule>>
-
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
-
     private lateinit var lastKnownLocation: android.location.Location
-
     private lateinit var adapter: ShowListAdapter
+    private lateinit var lockList: ArrayList<TimeCapsule>
+    private lateinit var unlockList: ArrayList<TimeCapsule>
+    private lateinit var allList: ArrayList<TimeCapsule>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         initFusedLocation()
-//        getDeviceLocation()
 
         runOnIoScheduler {
             list = ArrayList(provideTimeCapsuleDao(context!!).loadAllTimeCapsule())
@@ -45,51 +44,9 @@ class ShowListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = inflater.inflate(R.layout.fragment_show_list, container, false)
         hashMap = linkedMapOf()
-
-        return view
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-//        for (i in list) {
-//            if (hashMap.containsKey(Location(i.latitude, i.longitude, i.date))) {
-//                hashMap[Location(i.latitude, i.longitude, i.date)]?.add(i)
-//            } else {
-//                hashMap[Location(i.latitude, i.longitude, i.date)] = arrayListOf(i)
-//            }
-//        }
-        setFabInvisible()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            5 -> {
-                if (data != null) {
-                    val intentList = data.getSerializableExtra("list") as ArrayList<TimeCapsule>
-                    adapter.removeItem(getKey(hashMap, intentList))
-//                    hashMap.clear()
-//                    adapter.notifyDataSetChanged()
-                }
-
-                runOnIoScheduler {
-                    list = ArrayList(provideTimeCapsuleDao(context!!).loadAllTimeCapsule())
-                }
-            }
-        }
-    }
-
-    private fun getKey(map: LinkedHashMap<Location, ArrayList<TimeCapsule>>, value: ArrayList<TimeCapsule>): Location? {
-        for (key in map.keys) {
-            if ((value[0].longitude == map[key]?.get(0)?.longitude) && (value[0].latitude == map[key]?.get(0)?.latitude)) {
-                return key
-            } else {
-            }
-        }
-        return null
-    }
-
-    override fun onResume() {
-        super.onResume()
+        lockList = ArrayList()
+        unlockList = ArrayList()
+        allList = ArrayList()
 
         for (i in list) {
             if (hashMap.containsKey(Location(i.latitude, i.longitude, i.date))) {
@@ -98,11 +55,37 @@ class ShowListFragment : Fragment() {
                 hashMap[Location(i.latitude, i.longitude, i.date)] = arrayListOf(i)
             }
         }
-        getDeviceLocation()
+
+        return view
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        getDeviceLocation()
+        setFabInvisible()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            5 -> {
+                if (data != null) {
+                    val intentList = data.getSerializableExtra("list") as ArrayList<TimeCapsule>
+                    val isBack = data.getBooleanExtra("back", true)
+
+                    if (isBack) {
+                        for (i in intentList.indices) {
+                            hashMap[Location(
+                                intentList[0].latitude,
+                                intentList[0].longitude,
+                                intentList[0].date
+                            )]?.remove(intentList[i])
+                        }
+                    } else {
+                        adapter.removeItem(allList.indexOf(intentList[0]))
+                    }
+                }
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -114,11 +97,53 @@ class ShowListFragment : Fragment() {
                         if (task.result != null) {
                             lastKnownLocation = task.result!!
 
+                            for (i in hashMap.keys) {
+                                if (calculateDistance(
+                                        i.latitude,
+                                        i.longitude,
+                                        lastKnownLocation.latitude,
+                                        lastKnownLocation.longitude
+                                    ) < 100
+                                ) {
+                                    unlockList.add(hashMap[i]?.get(0)!!).and(true)
+                                } else {
+                                    lockList.add(hashMap[i]?.get(0)!!).and(false)
+
+                                }
+                            }
+
+                            unlockList.sortByDescending { it.date }
+                            lockList.sortByDescending { it.date }
+
+                            allList.addAll(unlockList)
+                            allList.addAll(lockList)
+
                             when {
                                 list.size > 0 -> {
                                     show_list_layout.setImageResource(0)
                                     show_list_empty_txv.text = null
-                                    adapter = ShowListAdapter(hashMap, context, lastKnownLocation, this@ShowListFragment)
+                                    adapter =
+                                        ShowListAdapter(
+                                            allList,
+                                            context,
+                                            lastKnownLocation,
+                                            this@ShowListFragment
+                                        )
+                                    adapter.itemClick = object : ShowListAdapter.ItemClick {
+                                        override fun onClick(view: View, mapPosition: TimeCapsule) {
+                                            val intent = Intent(context, DetailCardActivity::class.java)
+                                            intent.putExtra(
+                                                "list",
+                                                hashMap[Location(
+                                                    mapPosition.latitude,
+                                                    mapPosition.longitude,
+                                                    mapPosition.date
+                                                )]
+                                            )
+                                            startActivityForResult(intent, 5)
+                                        }
+
+                                    }
                                     rv_show_list.adapter = adapter
                                 }
                                 else -> {
@@ -127,34 +152,20 @@ class ShowListFragment : Fragment() {
                                 }
                             }
 
-
                         } else {
-                            /*
-                            *   2가지 생성 ( location request & callback )
-                            */
                             val locationRequest: LocationRequest = LocationRequest.create()
                             locationRequest.interval = 10000
                             locationRequest.fastestInterval = 5000
                             locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
-                            /*
-                            *   콜백은 위치가 업데이트 되었을 때 실행됨
-                            */
                             locationCallback = object : LocationCallback() {
                                 override fun onLocationResult(result: LocationResult?) {
                                     super.onLocationResult(result)
-                                    /*
-                                    *   업데이트 된 위치가 아직도 null 일 때
-                                    */
                                     if (result == null) {
                                         return
                                     }
 
                                     lastKnownLocation = result.lastLocation
-
-                                    /*
-                                    *   위치 업데이트를 제거하는 것 중요! ( prevent recursion of location updates )
-                                    */
                                     fusedLocationProviderClient.removeLocationUpdates(locationCallback)
                                 }
                             }
@@ -173,5 +184,21 @@ class ShowListFragment : Fragment() {
 
     private fun initFusedLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context!!)
+    }
+
+    fun changeView() {
+        if (allList.isEmpty()) {
+            show_list_layout.setImageResource(R.drawable.ic_list_empty)
+            show_list_empty_txv.text = "아직 기록된 카드가 없어요..."
+        } else {
+
+        }
+    }
+
+    fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Float {
+        val results = FloatArray(1)
+        android.location.Location.distanceBetween(lat1, lng1, lat2, lng2, results)
+        // distance in meter
+        return results[0]
     }
 }
