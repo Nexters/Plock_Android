@@ -55,6 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="카드기록"
+                android:fontFamily="@font/notosans_regular"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
@@ -87,6 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="열람하기"
+                android:fontFamily="@font/notosans_regular"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
