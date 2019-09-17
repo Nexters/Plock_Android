@@ -29,7 +29,7 @@ class DetailCardActivity : AppCompatActivity() {
     lateinit var viewModel: DetailCardViewModel
     lateinit var list: ArrayList<TimeCapsule>
     lateinit var adapter: CardPagerAdapter
-    private var tempList: ArrayList<TimeCapsule> = arrayListOf()
+    private var tempList: ArrayList<TimeCapsule> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,10 +71,9 @@ class DetailCardActivity : AppCompatActivity() {
 
         if (list.size == 0) {
             intent.putExtra("list", tempList)
+            intent.putExtra("back", false)
             setResult(5, intent)
             finish()
-        } else {
-            tempList.add(deleteItem)
         }
 
         adapter.notifyDataSetChanged()
@@ -118,5 +117,15 @@ class DetailCardActivity : AppCompatActivity() {
     private fun initToolbar() {
         imv_toolbar_right.setImageResource(R.drawable.ic_delete)
         imv_toolbar_left.setOnClickListener { finish() }
+    }
+
+    override fun onBackPressed() {
+        if (tempList.size != 0) {
+            val intent = Intent()
+            intent.putExtra("list", tempList)
+            intent.putExtra("back", true)
+            setResult(5, intent)
+        }
+        super.onBackPressed()
     }
 }
