@@ -2,13 +2,13 @@ package com.teamnexters.plock.ui.show
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +20,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -27,14 +28,21 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.runOnIoScheduler
 import com.teamnexters.plock.ui.detailcard.DetailCardActivity
 import com.teamnexters.plock.ui.show.model.Location
-import com.teamnexters.plock.util.CheckLocationPermission
 import com.teamnexters.plock.util.MapTools
 
 class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
@@ -57,13 +65,23 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
     private lateinit var markerPhotoNum: AppCompatTextView
     private lateinit var hashMap: HashMap<Location, ArrayList<TimeCapsule>>
 
-    private var saveMarker: HashMap<Location, MarkerOptions> = hashMapOf()
+    private var saveMarker: HashMap<Location, Marker> = hashMapOf()
 
     private lateinit var lastKnownLocation: android.location.Location
 
+    fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Float {
+        val results = FloatArray(1)
+        android.location.Location.distanceBetween(lat1, lng1, lat2, lng2, results)
+        return results[0]
+    }
+
     override fun onMarkerClick(p0: Marker?): Boolean {
-        if (((p0?.position?.latitude!! < lastKnownLocation.latitude + 0.01) && (p0.position?.longitude!! < lastKnownLocation.longitude + 0.01)
-                    && (p0.position?.latitude!! > lastKnownLocation.latitude - 0.01) && (p0.position.longitude > lastKnownLocation.longitude - 0.01))
+        if (calculateDistance(
+                p0?.position?.latitude!!,
+                p0.position?.longitude!!,
+                lastKnownLocation.latitude,
+                lastKnownLocation.longitude
+            ) < 100
         ) {
             activity?.let {
                 val intent = Intent(context, DetailCardActivity::class.java)
@@ -74,26 +92,54 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
         } else {
             Toast.makeText(context, "근처로 이동해야 열람하실 수 있습니다!", Toast.LENGTH_SHORT).show()
         }
-
         return false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             5 -> {
-                // hashMap.clear()
                 if (data != null) {
                     val intentList = data.getSerializableExtra("list") as ArrayList<TimeCapsule>
-                    for (i in intentList) {
-                        saveMarker.remove(Location(i.latitude, i.longitude, i.date))
+                    val isBack = data.getBooleanExtra("back", true)
+                    // 단일 갯수
+                    if (isBack) {
+                        val markerName = saveMarker[Location(intentList[0].latitude, intentList[0].longitude, null)]
+                        markerName?.remove()
+                        saveMarker[Location(intentList[0].latitude, intentList[0].longitude, null)]?.remove()
+                        for (i in intentList.indices) {
+                            hashMap[Location(
+                                intentList[0].latitude,
+                                intentList[0].longitude,
+                                null
+                            )]?.remove(intentList[i])
+                        }
+
+                        markerLock.visibility = View.INVISIBLE
+                        markerPhotoNum.visibility = View.VISIBLE
+                        markerPhotoNum.text = (hashMap[Location(
+                            intentList[0].latitude,
+                            intentList[0].longitude,
+                            null
+                        )]?.size!!).toString()
+
+                        val byteArray =
+                            hashMap[Location(intentList[0].latitude, intentList[0].longitude, null)]?.get(0)?.photo
+                        val photo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
+                        markerPhoto.setImageBitmap(photo)
+
+                        val latLng = LatLng(intentList[0].latitude, intentList[0].longitude)
+                        val markerOptions = MarkerOptions()
+                        markerOptions.position(latLng)
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
+
+                        val marker: Marker = mMap.addMarker(markerOptions)
+                        mMap.addMarker(markerOptions)
+                        saveMarker[Location(intentList[0].latitude, intentList[0].longitude, null)] = marker
+                    } else {
+                        val markerName = saveMarker[Location(intentList[0].latitude, intentList[0].longitude, null)]
+                        markerName?.remove()
                     }
-                    //mMap.clear()
                 }
-
-                runOnIoScheduler {
-                    list = ArrayList(provideTimeCapsuleDao(context!!).loadAllTimeCapsule())
-                }
-
             }
         }
     }
@@ -118,45 +164,68 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
                 mMap.isMyLocationEnabled = true
                 locationBtn.visibility = View.GONE
             } else {
-                // Show rationale and request permission.
-                CheckLocationPermission.checkPermission(activity!!, mMap, locationBtn)
+                checkPermission(activity!!)
+            }
+        }
+    }
+
+    private fun addMarker() {
+        for (i in hashMap.keys) {
+            val byteArray = hashMap[i]?.get(0)?.photo
+            val photo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
+
+            markerPhoto.setImageBitmap(photo)
+
+            if (hashMap[i]?.size!! > 1) {
+                markerPhotoNum.visibility = View.VISIBLE
+                markerPhotoNum.text = hashMap[i]?.size!!.toString()
+            } else {
+                markerPhotoNum.visibility = View.INVISIBLE
             }
 
-            //addMarker()
+            val latLng = LatLng(i.latitude, i.longitude)
+            val markerOptions = MarkerOptions()
+            markerOptions.position(latLng)
 
-        } else {
-            Log.e("error", "Error loading google Map")
+            if (calculateDistance(
+                    i.latitude,
+                    i.longitude,
+                    lastKnownLocation.latitude,
+                    lastKnownLocation.longitude
+                ) < 100
+            ) {
+                markerLock.visibility = View.INVISIBLE
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
+                val marker = mMap.addMarker(markerOptions)
+
+                marker.tag = true
+                saveMarker[i] = marker
+            } else {
+                markerLock.visibility = View.VISIBLE
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
+                val marker = mMap.addMarker(markerOptions)
+                marker.tag = false
+                saveMarker[i] = marker
+            }
         }
-
     }
 
     override fun onCameraMove() {
     }
 
     override fun onCameraIdle() {
-        // startLocationUpdates()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.e("dd", "onResume")
-//        hashMap = hashMapOf()
-//        for (i in list) {
-//            Log.e("L", "LIST")
-//            if (hashMap.containsKey(Location(i.latitude, i.longitude, null))) {
-//                hashMap[Location(i.latitude, i.longitude, null)]?.add(i)
-//            } else {
-//                hashMap[Location(i.latitude, i.longitude, null)] = arrayListOf(i)
-//            }
-//        }
         startLocationUpdates()
     }
 
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
         val locationRequest = LocationRequest.create()?.apply {
-            interval = 10000
-            fastestInterval = 5000
+            interval = 8000
+            fastestInterval = 4000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         fusedLocationProviderClient.requestLocationUpdates(
@@ -175,6 +244,86 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
+    private fun callbackLocation() {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                locationResult ?: return
+                lastKnownLocation = locationResult.lastLocation
+                // 마커 체크
+                for (i in saveMarker.values) {
+                    val lat = i.position.latitude
+                    val long = i.position.longitude
+                    // 범위 내로 들어올 때
+                    if (calculateDistance(
+                            lat,
+                            long,
+                            lastKnownLocation.latitude,
+                            lastKnownLocation.longitude
+                        ) < 100
+                    ) {
+                        // 해당 마커가 범위 안으로 들어왔을 때
+                        if (i.tag == false) {
+                            val markerName = saveMarker[Location(lat, long, null)]
+                            markerName?.remove()
+
+                            val byteArray = hashMap[Location(lat, long, null)]?.get(0)?.photo
+                            val photo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
+                            markerPhoto.setImageBitmap(photo)
+
+                            if (hashMap[Location(lat, long, null)]?.size!! > 1) {
+                                markerPhotoNum.visibility = View.VISIBLE
+                                markerPhotoNum.text = hashMap[Location(lat, long, null)]?.size!!.toString()
+                            } else {
+                                markerPhotoNum.visibility = View.INVISIBLE
+                            }
+
+                            markerLock.visibility = View.INVISIBLE
+
+                            val latLng = LatLng(lat, long)
+                            val markerOptions = MarkerOptions()
+                            markerOptions.position(latLng)
+                            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
+
+                            val marker = mMap.addMarker(markerOptions)
+                            marker.tag = true
+                            saveMarker[Location(lat, long, null)] = marker
+                        }
+                    } else {
+                        // 밖으로 나가게 되었을 때
+                        if (i.tag == true) {
+                            val markerName = saveMarker[Location(lat, long, null)]
+                            markerName?.remove()
+
+                            val byteArray = hashMap[Location(lat, long, null)]?.get(0)?.photo
+                            val photo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
+                            markerPhoto.setImageBitmap(photo)
+
+                            if (hashMap[Location(lat, long, null)]?.size!! > 1) {
+                                markerPhotoNum.visibility = View.VISIBLE
+                                markerPhotoNum.text = hashMap[Location(lat, long, null)]?.size!!.toString()
+                            } else {
+                                markerPhotoNum.visibility = View.INVISIBLE
+                            }
+
+                            markerLock.visibility = View.VISIBLE
+
+                            val latLng = LatLng(lat, long)
+                            val markerOptions = MarkerOptions()
+                            markerOptions.position(latLng)
+                            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
+
+                            val marker = mMap.addMarker(markerOptions)
+                            marker.tag = false
+
+                            saveMarker[Location(lat, long, null)] = marker
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         findMarkerView()
@@ -182,47 +331,7 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
             list = ArrayList(provideTimeCapsuleDao(context!!).loadAllTimeCapsule())
         }
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                locationResult ?: return
-
-                lastKnownLocation = locationResult.lastLocation
-
-                for (location in locationResult.locations) {
-                    mMap.clear()
-
-                    for (i in hashMap.keys) {
-                        if (((i.latitude < location.latitude + 0.01) && (i.longitude < location.longitude + 0.01)
-                                    && (i.latitude > location.latitude - 0.01) && (i.longitude > location.longitude - 0.01))
-                        ) {
-                            markerLock.visibility = View.INVISIBLE
-                        } else {
-                            markerLock.visibility = View.VISIBLE
-                        }
-
-                        if (hashMap[i]?.size!! > 1) {
-                            markerPhotoNum.visibility = View.VISIBLE
-                            markerPhotoNum.text = hashMap[i]?.size!!.toString()
-                        } else {
-                            markerPhotoNum.visibility = View.INVISIBLE
-                        }
-
-                        val byteArray = hashMap[i]?.get(0)?.photo
-                        val photo = BitmapFactory.decodeByteArray(byteArray, 0, byteArray?.size!!)
-                        markerPhoto.setImageBitmap(photo)
-
-                        val latLng = LatLng(i.latitude, i.longitude)
-                        val markerOptions = MarkerOptions()
-                        markerOptions.position(latLng)
-                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createBitmapFromView(markerRootView)))
-
-                        mMap.addMarker(markerOptions)
-                        saveMarker[i] = markerOptions
-                    }
-
-                }
-            }
-        }
+        callbackLocation()
     }
 
 
@@ -232,23 +341,75 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
         mapFragment.getMapAsync(this)
         mapView = mapFragment.view!!
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context!!)
+        getDeviceLocation()
+
         return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context!!)
         hashMap = hashMapOf()
-        for (i in list) {
-            Log.e("L", "LIST")
-            if (hashMap.containsKey(Location(i.latitude, i.longitude, null))) {
-                hashMap[Location(i.latitude, i.longitude, null)]?.add(i)
-            } else {
-                hashMap[Location(i.latitude, i.longitude, null)] = arrayListOf(i)
+        if (this::list.isInitialized) {
+            for (i in list) {
+                if (hashMap.containsKey(Location(i.latitude, i.longitude, null))) {
+                    hashMap[Location(i.latitude, i.longitude, null)]?.add(i)
+                } else {
+                    hashMap[Location(i.latitude, i.longitude, null)] = arrayListOf(i)
+                }
             }
+        } else {
         }
+
         setFabVisible()
         setFabClickListener()
+    }
+
+    @SuppressLint("MissingPermission")
+    fun getDeviceLocation() {
+        fusedLocationProviderClient.lastLocation
+            .addOnCompleteListener(object : OnCompleteListener<android.location.Location> {
+                override fun onComplete(task: Task<android.location.Location>) {
+                    if (task.isSuccessful) {
+                        if (task.result != null) {
+                            lastKnownLocation = task.result!!
+                            mMap.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude),
+                                    15F
+                                )
+                            )
+                            addMarker()
+                        } else {
+                            val locationRequest: LocationRequest = LocationRequest.create()
+                            locationRequest.interval = 8000
+                            locationRequest.fastestInterval = 4000
+                            locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
+                            locationCallback = object : LocationCallback() {
+                                override fun onLocationResult(result: LocationResult?) {
+                                    super.onLocationResult(result)
+                                    if (result == null) return
+
+                                    lastKnownLocation = result.lastLocation
+                                    mMap.animateCamera(
+                                        CameraUpdateFactory.newLatLngZoom(
+                                            LatLng(
+                                                lastKnownLocation.latitude,
+                                                lastKnownLocation.longitude
+                                            ), 17F
+                                        )
+                                    )
+                                    fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+                                }
+                            }
+                            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
+                        }
+                    } else {
+                        Toast.makeText(context, "위치를 찾을 수 없습니다", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
     }
 
     private fun setFabVisible() {
@@ -289,6 +450,32 @@ class ShowMapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationBu
         v.layout(v.left, v.top, v.right, v.bottom)
         v.draw(c)
         return bitmap
+    }
+
+    private fun checkPermission(activity: Activity) {
+        Dexter.withActivity(activity)
+            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            .withListener(object : PermissionListener {
+                @SuppressLint("MissingPermission")
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    mMap.isMyLocationEnabled = true
+                    locationBtn.visibility = View.GONE
+                    getDeviceLocation()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    activity.finish()
+                    Toast.makeText(activity, "앱 내 위치권한을 확인하세요", Toast.LENGTH_SHORT).show()
+                }
+            })
+            .check()
     }
 }
 
