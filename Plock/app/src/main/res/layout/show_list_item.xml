@@ -54,13 +54,14 @@
                 android:text="처음만난곳"
                 android:textSize="18sp"
                 android:textColor="@color/white"
+                android:layout_marginTop="4dp"
                 app:layout_constraintTop_toBottomOf="@+id/txv_date_show_list"
                 app:layout_constraintLeft_toLeftOf="@+id/txv_date_show_list"/>
 
         <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imv_lock_show_list"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="15dp"
+                android:layout_height="18dp"
                 android:layout_marginBottom="@dimen/show_list_margin_left"
                 android:layout_marginEnd="@dimen/show_list_margin_top"
                 app:srcCompat="@drawable/lock"

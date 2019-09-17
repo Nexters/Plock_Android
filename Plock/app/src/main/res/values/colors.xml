@@ -18,6 +18,7 @@
     <!-- toolbar -->
     <color name="white_80">#cdffffff</color>
     <color name="charcoal_grey">#343a40</color>
+    <color name="gunmetal">#495057</color>
 
     <color name="radio_button_selected_color">#4dadf7</color>
     <color name="radio_button_unselected_color">@android:color/transparent</color>
