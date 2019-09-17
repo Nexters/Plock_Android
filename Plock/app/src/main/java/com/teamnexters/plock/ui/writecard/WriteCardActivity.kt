@@ -336,7 +336,7 @@ class WriteCardActivity : AppCompatActivity() {
                                             }
                                         }
                                     }
-                                    placeNameTv.text = sb
+                                    placeNameTv.text = getUnderLineStr(sb.toString())
                                 }
 
                             } catch (e: IOException) {
