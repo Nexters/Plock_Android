@@ -28,8 +28,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:layout_marginStart="@dimen/toolbar_left_margin"
-                    app:srcCompat="@drawable/ic_arrow_left"
-            />
+                    app:srcCompat="@drawable/ic_arrow_left"/>
 
             <info.hoang8f.android.segmented.SegmentedGroup
                     android:id="@+id/segment_group_toolbar"
