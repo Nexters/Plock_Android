@@ -2,6 +2,7 @@ package com.teamnexters.plock.ui.writecard
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -9,6 +10,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.SpannableString
@@ -16,6 +19,9 @@ import android.text.style.UnderlineSpan
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.teamnexters.plock.R
 import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
@@ -32,6 +38,7 @@ import kotlinx.android.synthetic.main.card_front.*
 import kotlinx.android.synthetic.main.dialog_two_button.view.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,6 +70,12 @@ class WriteCardActivity : AppCompatActivity() {
     private var long = 0.0
     private var locationName = ""
 
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    // 기기의 마지막 위치 저장
+    private lateinit var lastKnownLocation: Location
+    private lateinit var geoCoder: Geocoder
+    private lateinit var locationCallback: LocationCallback
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write_card)
@@ -75,6 +88,9 @@ class WriteCardActivity : AppCompatActivity() {
         lifecycle += viewDisposables
 
         initToolbar()
+        initFusedLocation()
+        initGeoCoder()
+        getDeviceLocation()
         initCardSize()
         loadFlipAnimations()
         setUpTodayDate()
@@ -258,7 +274,7 @@ class WriteCardActivity : AppCompatActivity() {
 
     private fun bitmapToByteArray(): ByteArray {
         val stream = ByteArrayOutputStream()
-        selectedImage?.compress(Bitmap.CompressFormat.JPEG, 60, stream)
+        selectedImage?.compress(Bitmap.CompressFormat.JPEG, 40, stream)
         return stream.toByteArray()
     }
 
@@ -276,5 +292,81 @@ class WriteCardActivity : AppCompatActivity() {
     private fun initToolbar() {
         tv_toolbar_center.text = "작성"
         imv_toolbar_right.setImageResource(R.drawable.ic_check)
+    }
+
+    private fun initFusedLocation() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(applicationContext)
+    }
+
+    private fun initGeoCoder() {
+        geoCoder = Geocoder(applicationContext, Locale.KOREAN)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getDeviceLocation() {
+        fusedLocationProviderClient.lastLocation
+            .addOnCompleteListener(object : OnCompleteListener<Location> {
+                override fun onComplete(task: Task<Location>) {
+                    if (task.isSuccessful) {
+                        if (task.result != null) {
+                            lastKnownLocation = task.result!!
+                            lat = lastKnownLocation.latitude
+                            long = lastKnownLocation.longitude
+
+                            try {
+                                val mResultList = geoCoder.getFromLocation(
+                                    lastKnownLocation.latitude,
+                                    lastKnownLocation.longitude,
+                                    1
+                                )
+
+                                if (mResultList != null && mResultList.size > 0) {
+                                    placeNameTv.text = mResultList[0].getAddressLine(0)
+                                }
+
+                            } catch (e: IOException) {
+                                e.printStackTrace()
+                            }
+                        } else {
+                            val locationRequest: LocationRequest = LocationRequest.create()
+                            locationRequest.interval = 8000
+                            locationRequest.fastestInterval = 4000
+                            locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
+                            locationCallback = object : LocationCallback() {
+                                override fun onLocationResult(result: LocationResult?) {
+                                    super.onLocationResult(result)
+                                    if (result == null) {
+                                        return
+                                    }
+
+                                    lastKnownLocation = result.lastLocation
+                                    lat = lastKnownLocation.latitude
+                                    long = lastKnownLocation.longitude
+
+                                    try {
+                                        val mResultList = geoCoder.getFromLocation(
+                                            lastKnownLocation.latitude,
+                                            lastKnownLocation.longitude,
+                                            1
+                                        )
+
+                                        if (mResultList != null && mResultList.size > 0) {
+                                        }
+
+                                    } catch (e: IOException) {
+                                        e.printStackTrace()
+                                    }
+                                    fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+                                }
+                            }
+                            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
+                        }
+                    } else {
+                        placeNameTv.text = "저장 위치를 선택해주세요"
+                    }
+                }
+
+            })
     }
 }
