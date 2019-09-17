@@ -50,6 +50,24 @@ class MapLocationActivity : AppCompatActivity(),
     private var longitude = 0.0
     private var locationName = ""
 
+    private fun substringAddress(res: String): java.lang.StringBuilder {
+        val resArr = res.split(" ")
+        val sb = StringBuilder("")
+        if (resArr.size == 1) {
+            sb.append(resArr[0])
+        } else {
+            for (i in resArr.indices) {
+                sb.append(resArr[i+1])
+                sb.append(" ")
+                if (i == resArr.size - 2) {
+                    break
+                }
+            }
+        }
+
+        return sb
+    }
+
     override fun onCameraIdle() {
         if (!checkOnce) {
             checkOnce = true
@@ -63,8 +81,9 @@ class MapLocationActivity : AppCompatActivity(),
                     1
                 )
                 if (mResultList != null && mResultList.size > 0) {
-                    cardETxt.text = mResultList[0].getAddressLine(0)
-                    locationName = mResultList[0].getAddressLine(0)
+                    val res = mResultList[0].getAddressLine(0)
+                    locationName = substringAddress(res).toString()
+                    cardETxt.text = substringAddress(res)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -149,8 +168,9 @@ class MapLocationActivity : AppCompatActivity(),
                                 )
 
                                 if (mResultList != null && mResultList.size > 0) {
-                                    cardETxt.text = mResultList[0].getAddressLine(0)
-                                    locationName = mResultList[0].getAddressLine(0)
+                                    val res = mResultList[0].getAddressLine(0)
+                                    locationName = substringAddress(res).toString()
+                                    cardETxt.text = substringAddress(res)
                                 }
 
                             } catch (e: IOException) {
@@ -188,8 +208,9 @@ class MapLocationActivity : AppCompatActivity(),
                                         )
 
                                         if (mResultList != null && mResultList.size > 0) {
-                                            cardETxt.text = mResultList[0].getAddressLine(0)
-                                            locationName = mResultList[0].getAddressLine(0)
+                                            val res = mResultList[0].getAddressLine(0)
+                                            locationName = substringAddress(res).toString()
+                                            cardETxt.text = substringAddress(res)
                                         }
 
                                     } catch (e: IOException) {

@@ -322,7 +322,21 @@ class WriteCardActivity : AppCompatActivity() {
                                 )
 
                                 if (mResultList != null && mResultList.size > 0) {
-                                    placeNameTv.text = mResultList[0].getAddressLine(0)
+                                    val res = mResultList[0].getAddressLine(0)
+                                    val resArr = res.split(" ")
+                                    val sb = StringBuilder("")
+                                    if (resArr.size == 1) {
+                                        sb.append(resArr[0])
+                                    } else {
+                                        for (i in resArr.indices) {
+                                            sb.append(resArr[i+1])
+                                            sb.append(" ")
+                                            if (i == resArr.size - 2) {
+                                                break
+                                            }
+                                        }
+                                    }
+                                    placeNameTv.text = sb
                                 }
 
                             } catch (e: IOException) {
