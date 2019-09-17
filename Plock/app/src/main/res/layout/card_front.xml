@@ -122,7 +122,8 @@
                     android:id="@+id/changePlaceLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="64dp">
 
                 <ImageView
                         android:layout_width="14dp"
@@ -137,7 +138,7 @@
                         android:layout_weight="1"
                         android:textColor="@color/gray2"
                         android:textSize="12sp"
-                        android:text="저장 위치를 선택해주세요."/>
+                        android:maxLines="2"/>
 
                 <ImageView
                         android:id="@+id/changePlaceIv"

@@ -32,9 +32,10 @@
                 android:inputType="textMultiLine"
                 android:importantForAutofill="no"
                 tools:targetApi="o"
+                android:maxLength="250"
                 android:layout_marginRight="@dimen/card_content_margin_left"
-                android:layout_marginBottom="61dp"
-                android:visibility="visible"/>
+                android:layout_marginBottom="80dp"
+                android:visibility="gone"/>
 
         <TextView
                 android:id="@+id/cardMessageTv"

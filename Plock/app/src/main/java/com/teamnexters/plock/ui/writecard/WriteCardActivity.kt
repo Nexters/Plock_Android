@@ -96,6 +96,7 @@ class WriteCardActivity : AppCompatActivity() {
         setUpTodayDate()
         setEditTvEnabled()
 
+        placeNameTv.text = getUnderLineStr("저장 위치를 선택해주세요.")
         cardMessageEditTv.visibility = View.VISIBLE
         cardDateLayout.setOnClickListener { if (!isBackVisible) showDatePickerDialog() }
 
