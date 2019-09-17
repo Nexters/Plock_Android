@@ -49,7 +49,10 @@
                         android:layout_width="73dp"
                         android:layout_height="30dp"
                         android:text="지도"
-                        android:textSize="16sp"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/notosans_regular"
+                        android:includeFontPadding="false"
                         android:checked="true"
                         style="@style/RadioButton" />
 
@@ -58,7 +61,10 @@
                         android:layout_width="73dp"
                         android:layout_height="30dp"
                         android:text="리스트"
-                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/notosans_regular"
+                        android:includeFontPadding="false"
+                        android:textSize="13sp"
                         style="@style/RadioButton" />
 
             </info.hoang8f.android.segmented.SegmentedGroup>
