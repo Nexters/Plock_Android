@@ -41,13 +41,7 @@ class FindLocationAdapter(
         notifyDataSetChanged()
     }
 
-    fun clearList() {
-        strList.clear()
-        notifyDataSetChanged()
-    }
-
     inner class ListViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!) {
-
         val fullTitle = itemView?.findViewById<AppCompatTextView>(R.id.txv_fullTitle)
         val subTitle = itemView?.findViewById<AppCompatTextView>(R.id.txv_subTitle)
     }

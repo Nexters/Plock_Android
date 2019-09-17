@@ -14,6 +14,8 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.teamnexters.plock.R
 import kotlinx.android.synthetic.main.activity_find_location.*
 import kotlinx.android.synthetic.main.toolbar_custom.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class FindLocationActivity : AppCompatActivity() {
@@ -22,6 +24,7 @@ class FindLocationActivity : AppCompatActivity() {
     private lateinit var predictionList: List<AutocompletePrediction>
     private lateinit var adapter: FindLocationAdapter
     private lateinit var strList: ArrayList<String>
+    private lateinit var mResult: StringBuilder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,38 +35,70 @@ class FindLocationActivity : AppCompatActivity() {
         initRvAdapter()
 
         find_location_editText.addTextChangedListener(object : TextWatcher {
+
+            val token = AutocompleteSessionToken.newInstance()
+            var timer: Timer = Timer()
+
             override fun afterTextChanged(p0: Editable?) {
-                val predictionsRequest =
-                    FindAutocompletePredictionsRequest.builder()
-                        .setCountry("pk")
-                        .setTypeFilter(TypeFilter.ADDRESS)
-                        .setSessionToken(AutocompleteSessionToken.newInstance())
-                        .setQuery(p0.toString())
-                        .build()
-                // then we need to pass predictionsRequest to places API
-                placesClient.findAutocompletePredictions(predictionsRequest).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        val result = it.result
-                        if (result != null) {
-                            predictionList = result.autocompletePredictions
-                            val suggestionList = ArrayList<String>()
-                            for (i in predictionList.indices) {
-                                val prediction = predictionList[i]
-                                suggestionList.add(prediction.getFullText(null).toString())
+                if (p0?.toString()?.length!! >= 2) {
+                    timer.cancel()
+                    timer = Timer()
+                    timer.schedule(object : TimerTask() {
+                        override fun run() {
+                            val predictionsRequest =
+                                FindAutocompletePredictionsRequest.builder()
+                                    .setCountry("KR")
+                                    .setTypeFilter(TypeFilter.ADDRESS)
+                                    .setSessionToken(token)
+                                    .setQuery(p0.toString())
+                                    .build()
+                            // then we need to pass predictionsRequest to places API
+//                            placesClient.findAutocompletePredictions(predictionsRequest).addOnCompleteListener {
+//                                if (it.isSuccessful) {
+//                                    val result = it.result
+//                                    if (result != null) {
+//                                        predictionList = result.autocompletePredictions
+//                                        val suggestionList = ArrayList<String>()
+//                                        for (i in predictionList.indices) {
+//                                            val prediction = predictionList[i]
+//                                            suggestionList.add(prediction.getFullText(null).toString())
+//                                        }
+//                                        adapter.filterList(suggestionList)
+//                                    }
+//                                }
+//                            }.addOnFailureListener {
+//                                Log.e("failure", it.message!!)
+//                                adapter.notifyDataSetChanged()
+//                            }
+
+                            placesClient.findAutocompletePredictions(predictionsRequest).addOnSuccessListener {
+                                mResult = StringBuilder()
+                                predictionList = it.autocompletePredictions
+
+                                val suggestionList = ArrayList<String>()
+                                for (i in predictionList.indices) {
+                                    val prediction = predictionList[i]
+                                    suggestionList.add(prediction.getFullText(null).toString())
+                                }
+                                adapter.filterList(suggestionList)
+
+                            }.addOnFailureListener {
+                                Log.e("failure", it.message!!)
+                                adapter.notifyDataSetChanged()
                             }
-                            adapter.filterList(suggestionList)
                         }
-                    }
-                }.addOnFailureListener {
-                    Log.e("failure", it.message!!)
-                    adapter.notifyDataSetChanged()
+                    }, 2000)
+                } else {
                 }
+
+
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                //adapter.clearList()
             }
 
         })
@@ -75,7 +110,7 @@ class FindLocationActivity : AppCompatActivity() {
     }
 
     private fun initPlaceApi() {
-//      Initialize the SDK
+        // Initialize the SDK
         Places.initialize(applicationContext, getString(R.string.geo_api_key))
 
         // Create a new Places client instance
@@ -84,6 +119,7 @@ class FindLocationActivity : AppCompatActivity() {
 
     private fun initRvAdapter() {
         strList = ArrayList()
+        predictionList = listOf()
         adapter = FindLocationAdapter(this, strList)
         rv_find_location.adapter = adapter
     }
