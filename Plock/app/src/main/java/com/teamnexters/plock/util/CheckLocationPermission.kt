@@ -22,7 +22,6 @@ class CheckLocationPermission {
                 .withListener(object : PermissionListener {
                     @SuppressLint("MissingPermission")
                     override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                        Toast.makeText(activity, "Permission Granted!!", Toast.LENGTH_SHORT).show()
                         (activity as MapLocationActivity).getDeviceLocation()
                     }
 
