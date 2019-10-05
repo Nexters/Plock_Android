@@ -3,6 +3,7 @@ package com.teamnexters.plock.ui.show.adapter
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,7 +82,10 @@ class ShowListAdapter(
 
             // 위치 비교해서 lock, unlock 구분
             if (calculateDistance(capsule.latitude, capsule.longitude, lastLocation.latitude, lastLocation.longitude) < 100) {
-                parentLayout?.setBackgroundColor(Color.TRANSPARENT)
+                //parentLayout?.setBackgroundColor(Color.TRANSPARENT)
+                parentLayout?.setBackgroundColor(Color.parseColor("#26000000"))
+                title?.setTypeface(title.typeface, Typeface.BOLD)
+                date?.setTypeface(date.typeface, Typeface.BOLD)
                 lock_icon?.visibility = View.INVISIBLE
                 itemView.isClickable = true
             } else {
