@@ -17,6 +17,7 @@
 
     <!-- toolbar -->
     <color name="white_80">#cdffffff</color>
+    <color name="white_30">#4Dffffff</color>
     <color name="charcoal_grey">#343a40</color>
     <color name="gunmetal">#495057</color>
 

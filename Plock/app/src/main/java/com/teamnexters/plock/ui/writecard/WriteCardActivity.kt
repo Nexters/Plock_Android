@@ -27,7 +27,6 @@ import com.teamnexters.plock.data.entity.TimeCapsule
 import com.teamnexters.plock.data.provideTimeCapsuleDao
 import com.teamnexters.plock.extensions.plusAssign
 import com.teamnexters.plock.extensions.px
-import com.teamnexters.plock.extensions.start
 import com.teamnexters.plock.extensions.toast
 import com.teamnexters.plock.rx.AutoClearedDisposable
 import com.teamnexters.plock.ui.main.MainActivity
@@ -149,7 +148,10 @@ class WriteCardActivity : AppCompatActivity() {
             lat, long, bitmapToByteArray(), cardMessageEditTv.text.toString()
         )
         disposables += viewModel.saveTimeCapsule(timeCapsule)
-        start(MainActivity::class)
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+        //start(MainActivity::class)
         finish()
     }
 
